@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faustino | Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div id="loading-screen">
+        <div class="loader-ring"></div>
+        <p class="loader-text">Establishing connection<span class="loader-dots">...</span></p>
+    </div>
+
+    <div id="main-layout" class="hidden">
+        <div class="scanlines"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="overlay"></div>
+
+        <audio id="bg-audio">
+            <source src="assets/takeaslice.mp3" type="audio/mpeg">
+        </audio>
+
+
+        <main class="profile-card">
+            <div class="card-content">
+                <div class="avatar-container">
+                    <img src="https://ui-avatars.com/api/?name=F&background=random&size=150" alt="Profile Picture"
+                        class="avatar">
+                    <div class="status-dot"></div>
+                </div>
+
+                <h1 class="name">Faustino</h1>
+                <p class="tagline">@faustino</p>
+
+                <div class="social-links">
+                    <a href="https://www.roblox.com/users/3561671159/profile" target="_blank" class="social-icon"
+                        aria-label="Roblox"><svg class="roblox-svg" viewBox="0 0 512 512" fill="currentColor" width="20"
+                            height="20">
+                            <path
+                                d="M124.539 0L0 387.47 387.461 512 512 124.53 124.539 0zM283.395 340.267l-112.676-29.958 29.958-112.676 112.676 29.958-29.958 112.676z" />
+                        </svg></a>
+                    <a href="https://www.instagram.com/garbielp.p" target="_blank" class="social-icon"
+                        aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://mail.google.com/mail/?view=cm&to=loomkori@gmail.com" target="_blank"
+                        class="social-icon email-icon" aria-label="Gmail">
+                        <i class="fas fa-envelope"></i>
+                        <span class="email-tooltip">loomkori@gmail.com</span>
+                    </a>
+                    <a href="https://discord.com/users/833078738022563940" target="_blank" class="social-icon"
+                        aria-label="Discord"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+
+            <div class="bottom-bar" id="bottom-bar">
+                <div class="bar-header">
+                    <span class="bar-title">more about me...</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                <div class="bar-details">
+                    <div class="main-action-wrapper">
+                        <button class="about-btn primary-main-btn" data-modal="aboutme">
+                            <i class="fas fa-user-astronaut"></i>
+                            <span>About Me</span>
+                        </button>
+                    </div>
+                    <div class="about-scroll-row">
+                        <button class="about-btn" data-modal="games">
+                            <i class="fas fa-gamepad"></i>
+                            <span>Games</span>
+                        </button>
+                        <button class="about-btn" data-modal="anime">
+                            <i class="fas fa-dragon"></i>
+                            <span>Anime</span>
+                        </button>
+                        <button class="about-btn" data-modal="communities">
+                            <i class="fas fa-users"></i>
+                            <span>Communities</span>
+                        </button>
+                        <button class="about-btn" data-modal="skills">
+                            <i class="fas fa-terminal"></i>
+                            <span>Skills</span>
+                        </button>
+                        <button class="about-btn" data-modal="likings">
+                            <i class="fas fa-star"></i>
+                            <span>Likings</span>
+                        </button>
+                        <button class="about-btn" data-modal="learning">
+                            <i class="fas fa-book-open"></i>
+                            <span>Learning</span>
+                        </button>
+                        <button class="about-btn" data-modal="comforts">
+                            <i class="fas fa-cloud-moon"></i>
+                            <span>Comforts</span>
+                        </button>
+                        <button class="about-btn" data-modal="funfacts">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <span>Fun Facts</span>
+                        </button>
+                        <button class="about-btn" data-modal="goals">
+                            <i class="fas fa-rocket"></i>
+                            <span>Goals</span>
+                        </button>
+                        <button class="about-btn" data-modal="talktome">
+                            <i class="fas fa-comment-dots"></i>
+                            <span>Talk to Me</span>
+                        </button>
+                        <button class="about-btn lover-btn" data-modal="lover">
+                            <i class="fas fa-heart"></i>
+                            <span>Lover</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="modal-overlay" id="modal-overlay">
+            <div class="modal-card">
+                <button class="modal-close" id="modal-close"><i class="fas fa-xmark"></i></button>
+                <h2 class="modal-title" id="modal-title"></h2>
+                <div class="modal-body" id="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Messaging System ── -->
+    <button class="fab-msg" id="fab-msg" aria-label="Send Message"><i class="fas fa-envelope"></i></button>
+
+    <div class="msg-overlay" id="msg-overlay">
+        <div class="msg-card">
+            <div class="msg-header">
+                <h3><i class="fas fa-paper-plane"></i> Send a Message</h3>
+            </div>
+            <form id="msg-form">
+                <div class="msg-field-group" id="msg-user-grp">
+                    <label for="msg-user">User</label>
+                    <input type="text" id="msg-user" placeholder="Temporary, only for this message" autocomplete="off">
+                </div>
+                <div class="msg-anon-row">
+                    <input type="checkbox" id="msg-anon">
+                    <label for="msg-anon"><i class="fas fa-user-secret"></i> Send Anonymously</label>
+                </div>
+                <div class="msg-field-group">
+                    <label for="msg-topic">Topic</label>
+                    <input type="text" id="msg-topic" required autocomplete="off">
+                </div>
+                <div class="msg-field-group">
+                    <label for="msg-message">Message</label>
+                    <textarea id="msg-message" rows="4" required></textarea>
+                </div>
+                <div class="msg-actions">
+                    <button type="button" class="msg-btn msg-btn-back" id="msg-back"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button type="submit" class="msg-btn msg-btn-send"><i class="fas fa-paper-plane"></i> Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="msg-toast" id="msg-toast">
+        <i class="fas fa-check-circle"></i> Message sent!
+    </div>
+
+    <div class="custom-cursor"></div>
+    <script src="app.js"></script>
+</body>
+
+</html>
