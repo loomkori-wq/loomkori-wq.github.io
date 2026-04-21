@@ -263,10 +263,10 @@ document.addEventListener('DOMContentLoaded', () => {
             bgAudio.currentTime = 18; // Start at 0:18
             bgAudio.play().catch(e => console.error("Audio play() failed:", e));
             
-            // 5-second Fade-in (0.15 max volume: 0.15 / 100 steps = 0.0015 per 50ms)
+            // 5-second Fade-in (0.10 max volume: 0.10 / 100 steps = 0.001 per 50ms)
             let fadeIn = setInterval(() => {
-                if (bgAudio.volume < 0.15) {
-                    bgAudio.volume = Math.min(0.15, bgAudio.volume + 0.0015);
+                if (bgAudio.volume < 0.10) {
+                    bgAudio.volume = Math.min(0.10, bgAudio.volume + 0.001);
                 } else {
                     clearInterval(fadeIn);
                 }
@@ -276,10 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
             bgAudio.addEventListener('timeupdate', () => {
                 if (bgAudio.duration && bgAudio.currentTime >= bgAudio.duration - 3.0 && !isFadingOut) {
                     isFadingOut = true;
-                    // 3-second Fade-out (0.15 / 60 steps = 0.0025 per 50ms)
+                    // 3-second Fade-out (0.10 / 60 steps ≈ 0.0017 per 50ms)
                     let fadeOut = setInterval(() => {
-                        if (bgAudio.volume > 0.0025) {
-                            bgAudio.volume = Math.max(0, bgAudio.volume - 0.0025);
+                        if (bgAudio.volume > 0.0017) {
+                            bgAudio.volume = Math.max(0, bgAudio.volume - 0.0017);
                         } else {
                             bgAudio.volume = 0;
                             clearInterval(fadeOut);
@@ -296,8 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Re-fade in (5 seconds)
                 let reFadeIn = setInterval(() => {
-                    if (bgAudio.volume < 0.15) {
-                        bgAudio.volume = Math.min(0.15, bgAudio.volume + 0.0015);
+                    if (bgAudio.volume < 0.10) {
+                        bgAudio.volume = Math.min(0.10, bgAudio.volume + 0.001);
                     } else {
                         clearInterval(reFadeIn);
                     }
