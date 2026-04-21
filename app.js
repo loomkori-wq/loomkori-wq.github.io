@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const bottomBar = document.getElementById('bottom-bar');
     let isLoaded = false;
-    let audioContext, analyser, dataArray;
+
     
     // Unify entry binding: Ensure Web Audio API and audio playback start gracefully together
     const loaderText = document.querySelector('.loader-text');
@@ -259,25 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
             bgVideo.play().catch(e => console.log('Video autoplay blocked', e));
         }
         if (bgAudio) {
-            // Wake up the Web Audio API on this exact user gesture
-            if (!audioContext && window.location.protocol !== 'file:') {
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    analyser = audioContext.createAnalyser();
-                    const source = audioContext.createMediaElementSource(bgAudio);
-                    source.connect(analyser);
-                    analyser.connect(audioContext.destination);
-                    
-                    analyser.fftSize = 512;
-                    dataArray = new Uint8Array(analyser.frequencyBinCount);
-                    if (audioContext.state === 'suspended') {
-                        audioContext.resume();
-                    }
-                } catch (e) {
-                    console.error("Web Audio API failed to initialize:", e);
-                }
-            }
-
             bgAudio.volume = 0.0;
             bgAudio.currentTime = 18; // Start at 0:18
             bgAudio.play().catch(e => console.error("Audio play() failed:", e));
@@ -497,11 +478,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let particles = [];
         let dataPackets = [];
         
-        let pulseFactor = 0;
-        let smoothedAverage = 0; // For dynamic threshold beat detection
-        
         let mouse = { x: -1000, y: -1000 };
+
+
+        // ── Performance: detect low-power / mobile devices ──
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const isLowPower = isMobile || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
         let accentRgb = { r: 231, g: 213, b: 123 }; // Fallback
+
 
         // Extract rgb from hex logically
         function hexToRgb(hex) {
@@ -531,8 +515,10 @@ document.addEventListener('DOMContentLoaded', () => {
             particles = [];
             dataPackets = [];
             
-            // Moderate density for high performance without shadowBlur lag
-            const numParticles = Math.floor((width * height) / 10000); 
+            // Reduce density drastically on mobile to free CPU for audio
+            const densityDivisor = isLowPower ? 35000 : 10000;
+            const maxParticles = isLowPower ? 40 : 300;
+            const numParticles = Math.min(maxParticles, Math.floor((width * height) / densityDivisor)); 
             for (let i = 0; i < numParticles; i++) {
                 particles.push({
                     x: Math.random() * width,
@@ -581,36 +567,8 @@ document.addEventListener('DOMContentLoaded', () => {
         function animate() {
             ctx.clearRect(0, 0, width, height);
 
-            if (analyser) {
-                analyser.getByteFrequencyData(dataArray);
-                
-                // Focus strictly on exact sub-bass and kick-drum ranges (first ~8 bins)
-                let bassSum = 0;
-                for (let i = 0; i < 8; i++) {
-                    bassSum += dataArray[i];
-                }
-                const currentVolume = bassSum / (8.0 * 255.0);
-
-                // Smooth out the average for dynamic peak comparison
-                smoothedAverage = (smoothedAverage * 0.96) + (currentVolume * 0.04);
-                const threshold = smoothedAverage * 1.25 + 0.05; // Drop threshold logic
-
-                // Activate Peak "Plot Twist" Beating
-                if (currentVolume > threshold && currentVolume > 0.2) {
-                    pulseFactor = 1.0;
-                    
-                    // Velocity Pulse (Agitate nanites on beat)
-                    for (let i = 0; i < particles.length; i++) {
-                        particles[i].vx += (Math.random() - 0.5) * 1.8;
-                        particles[i].vy += (Math.random() - 0.5) * 1.8;
-                    }
-                } else {
-                    pulseFactor *= 0.82; // Sharp decay after beat drop
-                }
-            }
-
-            const connectionRadius = 200 + (200 * pulseFactor); // Base 200px -> 400px aggressively peak
-            const lwPulse = 1.0 + (3.0 * pulseFactor); // Base 1px -> 4px peak
+            const connectionRadius = 200; // Constant radius without pulse
+            const lwPulse = 1.0; // Constant linewidth without pulse
 
             // Calculate inverse parallax translation globally based on mouse
             let parallaxX = 0;
@@ -620,7 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 parallaxY = (mouse.y - height / 2) * -0.04;
             }
 
-            const neuralRadius = 80; // Particle to particle radius
+            const neuralRadius = isLowPower ? 0 : 80; // Skip neural web entirely on mobile
             const rgbStr = `${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}`;
 
             for (let i = 0; i < particles.length; i++) {
@@ -653,22 +611,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fill();
 
                 // Passive Neural Network (particle-to-particle links)
-                for (let j = i + 1; j < particles.length; j++) {
-                    const p2 = particles[j];
-                    const px2 = p2.x + parallaxX;
-                    const py2 = p2.y + parallaxY;
-                    const dpx = px - px2;
-                    const dpy = py - py2;
-                    const pDist = Math.sqrt(dpx * dpx + dpy * dpy);
-                    
-                    if (pDist < neuralRadius) {
-                        const nOpacity = (1 - pDist / neuralRadius) * 0.15; // Low opacity web
-                        ctx.beginPath();
-                        ctx.moveTo(px, py);
-                        ctx.lineTo(px2, py2);
-                        ctx.strokeStyle = `rgba(${rgbStr}, ${nOpacity})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
+                // Skipped entirely on low-power devices — this is O(n²) and murders mobile CPUs
+                if (neuralRadius > 0) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p2 = particles[j];
+                        const px2 = p2.x + parallaxX;
+                        const py2 = p2.y + parallaxY;
+                        const dpx = px - px2;
+                        const dpy = py - py2;
+                        const pDist = Math.sqrt(dpx * dpx + dpy * dpy);
+                        
+                        if (pDist < neuralRadius) {
+                            const nOpacity = (1 - pDist / neuralRadius) * 0.15; // Low opacity web
+                            ctx.beginPath();
+                            ctx.moveTo(px, py);
+                            ctx.lineTo(px2, py2);
+                            ctx.strokeStyle = `rgba(${rgbStr}, ${nOpacity})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
                     }
                 }
 
@@ -689,12 +650,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Render Traveling Data Packets directly between nodes
+            // Render Traveling Data Packets (reduced on mobile)
+            if (!isLowPower || dataPackets.length < 3) {
+                createPacket();
+            }
             dataPackets.forEach((pk, index) => {
                 const targetPx = pk.target.x;
                 const targetPy = pk.target.y;
                 
-                // Keep history of previous draw position for faint trail
                 const prevX = pk.x + parallaxX;
                 const prevY = pk.y + parallaxY;
 
@@ -719,7 +682,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 pk.life -= 0.015;
                 if (pk.life <= 0) dataPackets.splice(index, 1);
             });
-            createPacket();
 
             requestAnimationFrame(animate);
         }
