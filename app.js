@@ -476,8 +476,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const ctx = canvas.getContext('2d');
         let width, height;
         let particles = [];
-        let dataPackets = [];
-        
         let mouse = { x: -1000, y: -1000 };
 
 
@@ -513,7 +511,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function initParticles() {
             particles = [];
-            dataPackets = [];
             
             // Reduce density drastically on mobile to free CPU for audio
             const densityDivisor = isLowPower ? 35000 : 10000;
@@ -526,22 +523,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     vx: (Math.random() - 0.5) * 0.4,
                     vy: (Math.random() - 0.5) * 0.4,
                     size: Math.random() * 1.0 + 1.0
-                });
-            }
-        }
-
-        // Ambient Data Packets creation
-        function createPacket() {
-            if (Math.random() > 0.96 && particles.length > 1) { // Occasional spawn
-                const start = particles[Math.floor(Math.random() * particles.length)];
-                const end = particles[Math.floor(Math.random() * particles.length)];
-                dataPackets.push({
-                    x: start.x,
-                    y: start.y,
-                    pathX: start.x, // history tracking for trail
-                    pathY: start.y, // history tracking for trail
-                    target: end,
-                    life: 1.0
                 });
             }
         }
@@ -567,8 +548,8 @@ document.addEventListener('DOMContentLoaded', () => {
         function animate() {
             ctx.clearRect(0, 0, width, height);
 
-            const connectionRadius = 200; // Constant radius without pulse
-            const lwPulse = 1.0; // Constant linewidth without pulse
+            const staticRadius = 200; // Constant radius without pulse
+            const staticLineWidth = 1.0; // Constant linewidth without pulse
 
             // Calculate inverse parallax translation globally based on mouse
             let parallaxX = 0;
@@ -638,50 +619,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dy = mouse.y - py;
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist < connectionRadius) {
-                    const opacity = (1 - dist / connectionRadius) * 0.8;
+                if (dist < staticRadius) {
+                    const opacity = (1 - dist / staticRadius) * 0.8;
                     
                     ctx.beginPath();
                     ctx.moveTo(px, py);
                     ctx.lineTo(mouse.x, mouse.y);
                     ctx.strokeStyle = `rgba(${rgbStr}, ${opacity})`;
-                    ctx.lineWidth = lwPulse; 
+                    ctx.lineWidth = staticLineWidth; 
                     ctx.stroke();
                 }
             }
-
-            // Render Traveling Data Packets (reduced on mobile)
-            if (!isLowPower || dataPackets.length < 3) {
-                createPacket();
-            }
-            dataPackets.forEach((pk, index) => {
-                const targetPx = pk.target.x;
-                const targetPy = pk.target.y;
-                
-                const prevX = pk.x + parallaxX;
-                const prevY = pk.y + parallaxY;
-
-                pk.x += (targetPx - pk.x) * 0.05;
-                pk.y += (targetPy - pk.y) * 0.05;
-
-                const currX = pk.x + parallaxX;
-                const currY = pk.y + parallaxY;
-                
-                // Trail line
-                ctx.beginPath();
-                ctx.moveTo(prevX, prevY);
-                ctx.lineTo(currX, currY);
-                ctx.strokeStyle = `rgba(${rgbStr}, ${pk.life * 0.5})`;
-                ctx.lineWidth = 2.0;
-                ctx.stroke();
-
-                // Head square
-                ctx.fillStyle = `rgba(${rgbStr}, ${pk.life})`;
-                ctx.fillRect(currX - 2, currY - 2, 4, 4);
-                
-                pk.life -= 0.015;
-                if (pk.life <= 0) dataPackets.splice(index, 1);
-            });
 
             requestAnimationFrame(animate);
         }

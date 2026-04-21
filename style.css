@@ -99,16 +99,11 @@ a, button {
     border-radius: 50%;
     border: 3px solid rgba(231, 213, 123, 0.15);
     border-top-color: var(--accent);
-    animation: loaderSpin 1s linear infinite, loaderGlow 2.4s ease-in-out infinite;
+    animation: loaderSpin 1s linear infinite;
 }
 
 @keyframes loaderSpin {
     to { transform: rotate(360deg); }
-}
-
-@keyframes loaderGlow {
-    0%, 100% { box-shadow: 0 0 12px rgba(231, 213, 123, 0.2); }
-    50% { box-shadow: 0 0 28px rgba(231, 213, 123, 0.5); }
 }
 
 .loader-text {
@@ -121,19 +116,10 @@ a, button {
 
 .loader-dots {
     display: inline-block;
-    animation: dotPulse 1.4s steps(4, end) infinite;
     overflow: hidden;
     vertical-align: bottom;
     width: 1.5em;
     text-align: left;
-}
-
-@keyframes dotPulse {
-    0% { content: ''; width: 0; }
-    25% { width: 0.5em; }
-    50% { width: 1em; }
-    75% { width: 1.5em; }
-    100% { width: 0; }
 }
 #main-layout {
     position: relative;
@@ -170,15 +156,6 @@ a, button {
     z-index: -1;
 }
 
-/* ── THE GLITCH PULSE ── */
-@keyframes glitch-pulse {
-    0% { border-color: var(--card-border); transform: translate(0); }
-    1% { border-color: #fff; transform: translate(-2px, 2px); }
-    2% { border-color: var(--card-border); transform: translate(0); }
-    99% { border-color: var(--card-border); transform: translate(0); }
-    100% { border-color: #fff; transform: translate(2px, -2px); }
-}
-
 .profile-card {
     background: rgba(20, 20, 20, 0.45);
     backdrop-filter: blur(8px);
@@ -192,7 +169,6 @@ a, button {
     position: relative;
     display: flex;
     flex-direction: column;
-    animation: glitch-pulse 10s infinite;
 }
 
 .card-content {
@@ -612,12 +588,6 @@ a, button {
     padding: 12px 16px 4px 16px;
 }
 
-/* ── King Button Animation ── */
-@keyframes primaryPulse {
-    0%, 100% { box-shadow: 0 4px 18px rgba(231, 213, 123, 0.4), 0 0 30px rgba(231, 213, 123, 0.12); }
-    50% { box-shadow: 0 4px 26px rgba(231, 213, 123, 0.65), 0 0 50px rgba(231, 213, 123, 0.2); }
-}
-
 /* ── The King Button ── */
 .primary-main-btn {
     width: 100%;
@@ -630,7 +600,6 @@ a, button {
     border-radius: 12px;
     color: #1a1a1a;
     box-shadow: 0 4px 18px rgba(231, 213, 123, 0.4), 0 0 30px rgba(231, 213, 123, 0.12);
-    animation: primaryPulse 2.8s infinite ease-in-out;
 }
 
 .primary-main-btn i {
