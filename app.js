@@ -4,8 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainLayout = document.getElementById('main-layout');
     const bgAudio = document.getElementById('bg-audio');
     const loadingScreen = document.getElementById('loading-screen');
-
-    const bgVideo = document.getElementById('bg-video');
     const modalOverlay = document.getElementById('modal-overlay');
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body');
@@ -255,12 +253,9 @@ document.addEventListener('DOMContentLoaded', () => {
         mainLayout.classList.add('visible');
 
         // Start background media
-        if (bgVideo) {
-            bgVideo.play().catch(e => console.log('Video autoplay blocked', e));
-        }
         if (bgAudio) {
             bgAudio.volume = 0.0;
-            bgAudio.currentTime = 18; // Start at 0:18
+            bgAudio.currentTime = 0; // Start at beginning
             bgAudio.play().catch(e => console.error("Audio play() failed:", e));
             
             // 5-second Fade-in (0.10 max volume: 0.10 / 100 steps = 0.001 per 50ms)
@@ -288,9 +283,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             
-            // Loop gracefully back to 0:18
+            // Loop gracefully back to start
             bgAudio.addEventListener('ended', () => {
-                bgAudio.currentTime = 18;
+                bgAudio.currentTime = 0;
                 isFadingOut = false;
                 bgAudio.play();
                 
