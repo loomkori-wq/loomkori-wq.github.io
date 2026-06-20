@@ -185,6 +185,8 @@ a, button {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--card-border);
+    outline: 2px solid var(--accent); /* Added Outline */
+    outline-offset: 4px; /* Space between card and outline */
     border-radius: 20px;
     width: 90%;
     max-width: 400px;
@@ -227,6 +229,43 @@ a, button {
     border-radius: 50%;
     box-shadow: 0 0 10px #747f8d;
     transition: all 0.3s ease;
+    cursor: help;
+}
+
+.status-tooltip {
+    position: absolute;
+    bottom: 150%; /* Position above the dot */
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background-color: rgba(20, 20, 20, 0.9);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    border: 1px solid var(--accent);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy slide animation */
+}
+
+/* Tooltip tail (the little triangle pointing down) */
+.status-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--accent) transparent transparent transparent;
+}
+
+.status-dot:hover .status-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 .name {

@@ -1,6 +1,7 @@
 const DISCORD_USER_ID = '833078738022563940';
+const LOVER_DISCORD_ID = '819677851178500136'; // Replace this with shrieker.o7's Discord ID!
 
-document.addEventListener('DOMContentLoaded', () => {
+let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () => {
     const mainLayout = document.getElementById('main-layout');
     const bgAudio = document.getElementById('bg-audio');
     const loadingScreen = document.getElementById('loading-screen');
@@ -12,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bottomBar = document.getElementById('bottom-bar');
     let isLoaded = false;
 
-    
+
     // Unify entry binding: Ensure Web Audio API and audio playback start gracefully together
     const loaderText = document.querySelector('.loader-text');
     if (loaderText) {
@@ -205,8 +206,18 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         lover: {
             title: '<i class="fas fa-heart"></i> My Lover',
-            content: `<div class="lover-highlight">
-                <p>shrieker.o7</p>
+            content: `
+            <div class="profile-card lover-card" id="lover-card" style="margin: 10px auto; border: 1px solid var(--accent); outline: none; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: rgba(20,20,20,0.2);">
+                <div class="card-content" style="padding: 30px 20px;">
+                    <div class="avatar-container">
+                        <img src="https://ui-avatars.com/api/?name=S&background=random&size=150" alt="Profile Picture" class="avatar" id="lover-avatar" style="width: 100px; height: 100px;">
+                        <div class="status-dot" id="lover-status-dot" style="bottom: 5px; right: 5px; width: 16px; height: 16px;">
+                            <span class="status-tooltip" id="lover-status-tooltip">Offline</span>
+                        </div>
+                    </div>
+                    <h1 class="name" id="lover-name" style="font-size: 1.6rem;">shrieker.o7</h1>
+                    <p class="tagline" id="lover-tagline">@shrieker.o7</p>
+                </div>
             </div>`
         }
     };
@@ -219,6 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
             modalTitle.innerHTML = data.title;
             modalBody.innerHTML = data.content;
             modalOverlay.classList.add('active');
+
+            if (key === 'lover' && loverPresenceData) {
+                applyPresenceToDOM(loverPresenceData, true);
+            }
         });
     });
 
@@ -257,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bgAudio.volume = 0.0;
             bgAudio.currentTime = 0; // Start at beginning
             bgAudio.play().catch(e => console.error("Audio play() failed:", e));
-            
+
             // 5-second Fade-in (0.10 max volume: 0.10 / 100 steps = 0.001 per 50ms)
             let fadeIn = setInterval(() => {
                 if (bgAudio.volume < 0.10) {
@@ -282,13 +297,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 50);
                 }
             });
-            
+
             // Loop gracefully back to start
             bgAudio.addEventListener('ended', () => {
                 bgAudio.currentTime = 0;
                 isFadingOut = false;
                 bgAudio.play();
-                
+
                 // Re-fade in (5 seconds)
                 let reFadeIn = setInterval(() => {
                     if (bgAudio.volume < 0.10) {
@@ -312,9 +327,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const ws = new WebSocket('wss://api.lanyard.rest/socket');
 
         ws.onopen = () => {
+            const ids = [DISCORD_USER_ID];
+            if (LOVER_DISCORD_ID && LOVER_DISCORD_ID !== '819677851178500136') {
+                ids.push(LOVER_DISCORD_ID);
+            }
+
             ws.send(JSON.stringify({
                 op: 2,
-                d: { subscribe_to_id: DISCORD_USER_ID }
+                d: ids.length > 1 ? { subscribe_to_ids: ids } : { subscribe_to_id: DISCORD_USER_ID }
             }));
         };
 
@@ -329,8 +349,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, message.d.heartbeat_interval);
             }
 
-            if (message.t === 'INIT_STATE' || message.t === 'PRESENCE_UPDATE') {
-                updateDiscordUI(message.d);
+            if (message.t === 'INIT_STATE') {
+                if (message.d[DISCORD_USER_ID]) {
+                    // subscribe_to_ids used
+                    updateDiscordUI(message.d[DISCORD_USER_ID], false);
+                    if (message.d[LOVER_DISCORD_ID]) {
+                        updateDiscordUI(message.d[LOVER_DISCORD_ID], true);
+                    }
+                } else {
+                    // subscribe_to_id used
+                    updateDiscordUI(message.d, false);
+                }
+            } else if (message.t === 'PRESENCE_UPDATE') {
+                if (message.d.discord_user.id === LOVER_DISCORD_ID) {
+                    updateDiscordUI(message.d, true);
+                } else if (message.d.discord_user.id === DISCORD_USER_ID) {
+                    updateDiscordUI(message.d, false);
+                }
             }
         };
 
@@ -339,18 +374,38 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function updateDiscordUI(data) {
+    function updateDiscordUI(data, isLover = false) {
+        if (isLover) {
+            loverPresenceData = data;
+            if (document.getElementById('lover-card')) {
+                applyPresenceToDOM(data, true);
+            }
+        } else {
+            applyPresenceToDOM(data, false);
+        }
+    }
+
+    function applyPresenceToDOM(data, isLover) {
         try {
             const discordUser = data.discord_user;
+
+            const avatarEl = isLover ? document.getElementById('lover-avatar') : document.querySelector('.avatar:not(#lover-avatar)');
+            const nameEl = isLover ? document.getElementById('lover-name') : document.querySelector('.name:not(#lover-name)');
+            const taglineEl = isLover ? document.getElementById('lover-tagline') : document.querySelector('.tagline:not(#lover-tagline)');
+            const statusDot = isLover ? document.getElementById('lover-status-dot') : document.querySelector('.status-dot:not(#lover-status-dot)');
+            const tooltip = isLover ? document.getElementById('lover-status-tooltip') : document.getElementById('status-tooltip');
+            const cssTarget = isLover ? document.getElementById('lover-card') : document.documentElement;
+
+            if (!avatarEl) return;
 
             if (discordUser.avatar) {
                 const extension = discordUser.avatar.startsWith('a_') ? 'gif' : 'png';
                 const avatarUrl = `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.${extension}?size=512`;
-                document.querySelector('.avatar').src = avatarUrl;
+                avatarEl.src = avatarUrl;
             }
 
-            document.querySelector('.name').innerText = discordUser.display_name || discordUser.global_name || discordUser.username;
-            document.querySelector('.tagline').innerText = `@${discordUser.username}`;
+            nameEl.innerText = discordUser.display_name || discordUser.global_name || discordUser.username;
+            taglineEl.innerText = `@${discordUser.username}`;
 
             const statusColors = {
                 online: '#22c55e',
@@ -360,41 +415,38 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             const currentStatusColor = statusColors[data.discord_status] || statusColors.offline;
-            const statusDot = document.querySelector('.status-dot');
             statusDot.style.backgroundColor = currentStatusColor;
             statusDot.style.boxShadow = `0 0 10px ${currentStatusColor}`;
 
-            // Update theme accent color based on Discord profile
-            if (data.kv && data.kv.theme_color) {
-               document.documentElement.style.setProperty('--accent', data.kv.theme_color);
-            } else if (discordUser.avatar_decoration_data && discordUser.avatar_decoration_data.sku_id) {
-               // Discord doesn't natively expose the primary color in the standard presence payload if they don't have a banner color set.
-               // However, if we can grab a kv value from lanyard or fallback.
-               // We will attempt to use kv if you set it in lanyard, otherwise default.
-               // You can set kv via lanyard api: https://api.lanyard.rest/v1/users/[id]/kv/theme_color
+            const statusNames = {
+                online: 'Online',
+                idle: 'Idle',
+                dnd: 'Do Not Disturb',
+                offline: 'Offline'
+            };
+            if (tooltip) {
+                tooltip.innerText = statusNames[data.discord_status] || 'Offline';
             }
 
-            // A more reliable way for standard discord color (if they use a custom hex color for banner)
-            // Lanyard passes discord_user.accent_color as an integer (e.g. 16711680 for red)
-            if (discordUser.accent_color) {
+            if (data.kv && data.kv.theme_color) {
+                cssTarget.style.setProperty('--accent', data.kv.theme_color);
+            } else if (discordUser.accent_color) {
                 const hexColor = '#' + discordUser.accent_color.toString(16).padStart(6, '0');
-                document.documentElement.style.setProperty('--accent', hexColor);
-                document.documentElement.style.setProperty('--accent-hover', hexColor);
-                
+                cssTarget.style.setProperty('--accent', hexColor);
+                cssTarget.style.setProperty('--accent-hover', hexColor);
+
                 const r = (discordUser.accent_color >> 16) & 255;
                 const g = (discordUser.accent_color >> 8) & 255;
                 const b = discordUser.accent_color & 255;
-                document.documentElement.style.setProperty('--glow', `rgba(${r}, ${g}, ${b}, 0.4)`);
-                
-                // Trigger resize so background particles adapt to new color
-                window.dispatchEvent(new Event('resize'));
+                cssTarget.style.setProperty('--glow', `rgba(${r}, ${g}, ${b}, 0.4)`);
+
+                if (!isLover) window.dispatchEvent(new Event('resize'));
             } else if (discordUser.avatar) {
-                // FALLBACK: Extract dominant color directly from their avatar image
                 const img = new Image();
-                img.crossOrigin = "Anonymous"; // Allows canvas reading from Discord CDN
-                const extension = discordUser.avatar.startsWith('a_') ? 'png' : 'png'; // Force static frame for color extraction
+                img.crossOrigin = "Anonymous";
+                const extension = discordUser.avatar.startsWith('a_') ? 'png' : 'png';
                 img.src = `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.${extension}?size=64`;
-                
+
                 img.onload = () => {
                     const c = document.createElement('canvas');
                     c.width = 1;
@@ -402,16 +454,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     const ctx = c.getContext('2d');
                     ctx.drawImage(img, 0, 0, 1, 1);
                     const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-                    
+
                     const hex = "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
-                    const hoverHex = "#" + (1 << 24 | Math.min(255, r+30) << 16 | Math.min(255, g+30) << 8 | Math.min(255, b+30)).toString(16).slice(1);
-                    
-                    document.documentElement.style.setProperty('--accent', hex);
-                    document.documentElement.style.setProperty('--accent-hover', hoverHex);
-                    document.documentElement.style.setProperty('--glow', `rgba(${r}, ${g}, ${b}, 0.4)`);
-                    
-                    // Trigger resize so background particles adapt to new color
-                    window.dispatchEvent(new Event('resize'));
+                    const hoverHex = "#" + (1 << 24 | Math.min(255, r + 30) << 16 | Math.min(255, g + 30) << 8 | Math.min(255, b + 30)).toString(16).slice(1);
+
+                    cssTarget.style.setProperty('--accent', hex);
+                    cssTarget.style.setProperty('--accent-hover', hoverHex);
+                    cssTarget.style.setProperty('--glow', `rgba(${r}, ${g}, ${b}, 0.4)`);
+
+                    if (!isLover) window.dispatchEvent(new Event('resize'));
                 };
             }
 
@@ -628,7 +679,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch('https://api.ipify.org?format=json').then(res => res.json()).catch(() => ({})), // Force IPv4
             fetch('https://api64.ipify.org?format=json').then(res => res.json()).catch(() => ({})) // IPv6 or IPv4 fallback
         ]).then(([geo, v4Data, v6Data]) => {
-            
+
             let ipv4 = v4Data.ip || 'Could not detect';
             let ipv6 = 'Not available';
 
@@ -741,7 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            
+
             // Get computed accent dynamically 
             const rootStyles = getComputedStyle(document.documentElement);
             const accentHex = rootStyles.getPropertyValue('--accent').trim();
@@ -754,11 +805,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function initParticles() {
             particles = [];
-            
+
             // Reduce density drastically on mobile to free CPU for audio
             const densityDivisor = isLowPower ? 35000 : 10000;
             const maxParticles = isLowPower ? 40 : 300;
-            const numParticles = Math.min(maxParticles, Math.floor((width * height) / densityDivisor)); 
+            const numParticles = Math.min(maxParticles, Math.floor((width * height) / densityDivisor));
             for (let i = 0; i < numParticles; i++) {
                 particles.push({
                     x: Math.random() * width,
@@ -777,7 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.addEventListener('touchmove', (e) => {
-            if(e.touches.length > 0) {
+            if (e.touches.length > 0) {
                 mouse.x = e.touches[0].clientX;
                 mouse.y = e.touches[0].clientY;
             }
@@ -844,7 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const dpx = px - px2;
                         const dpy = py - py2;
                         const pDist = Math.sqrt(dpx * dpx + dpy * dpy);
-                        
+
                         if (pDist < neuralRadius) {
                             const nOpacity = (1 - pDist / neuralRadius) * 0.15; // Low opacity web
                             ctx.beginPath();
@@ -864,12 +915,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (dist < staticRadius) {
                     const opacity = (1 - dist / staticRadius) * 0.8;
-                    
+
                     ctx.beginPath();
                     ctx.moveTo(px, py);
                     ctx.lineTo(mouse.x, mouse.y);
                     ctx.strokeStyle = `rgba(${rgbStr}, ${opacity})`;
-                    ctx.lineWidth = staticLineWidth; 
+                    ctx.lineWidth = staticLineWidth;
                     ctx.stroke();
                 }
             }
