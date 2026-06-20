@@ -253,6 +253,21 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         }
     });
 
+    // Mute button logic
+    const muteBtn = document.getElementById('mute-btn');
+    if (muteBtn && bgAudio) {
+        muteBtn.addEventListener('click', () => {
+            if (bgAudio.muted || bgAudio.volume === 0) {
+                bgAudio.muted = false;
+                if (bgAudio.volume === 0) bgAudio.volume = 0.10; // Restore volume if it was 0
+                muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+            } else {
+                bgAudio.muted = true;
+                muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            }
+        });
+    }
+
     connectLanyard();
 
     function revealSite() {
