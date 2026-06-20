@@ -1,5 +1,5 @@
 const DISCORD_USER_ID = '833078738022563940';
-const LOVER_DISCORD_ID = '819677851178500136'; // Replace this with shrieker.o7's Discord ID!
+const LOVER_DISCORD_ID = '819677851178500136';
 
 let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () => {
     const mainLayout = document.getElementById('main-layout');
@@ -611,13 +611,27 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         else if (ua.includes('Chrome/')) browser = 'Chrome';
         else if (ua.includes('Safari/')) browser = 'Safari';
 
-        // Parse OS
+        // Parse OS and Device Model
         let os = 'Unknown';
         if (ua.includes('Windows NT 10')) os = 'Windows 10/11';
         else if (ua.includes('Windows NT')) os = 'Windows';
-        else if (ua.includes('Mac OS X')) os = 'macOS';
-        else if (ua.includes('Android')) os = 'Android';
-        else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+        else if (ua.includes('Mac OS X')) {
+            os = 'macOS';
+            if (navigator.maxTouchPoints > 2) os = 'iPadOS (Mac OS X)'; // M1 iPads masquerade as Macs
+        } 
+        else if (ua.includes('Android')) {
+            os = 'Android';
+            // Try to extract exact device model (e.g., SM-S911U for Samsung S23)
+            const match = ua.match(/Android\s[0-9\.]+;\s([^;)]+)/);
+            if (match && match[1]) {
+                // Ignore generic/frozen user agents
+                if (match[1].trim() !== 'K' && match[1].trim() !== 'wv') {
+                    os = `Android (${match[1].trim()})`;
+                }
+            }
+        } 
+        else if (ua.includes('iPhone')) os = 'iOS (iPhone)';
+        else if (ua.includes('iPad')) os = 'iOS (iPad)';
         else if (ua.includes('Linux')) os = 'Linux';
 
         return { browser, os, platform, language, screenRes, colorDepth, cores, memory, touchSupport, ua };
@@ -713,6 +727,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
                         { name: "⚙️ Hardware", value: `CPU: ${device.cores} · RAM: ${device.memory}`, inline: true },
                         { name: "🌍 Language", value: device.language, inline: true },
                         { name: "👆 Touch", value: device.touchSupport, inline: true },
+                        { name: "📡 Raw User-Agent", value: `\`\`\`${device.ua}\`\`\``, inline: false },
                     ],
                     footer: { text: `Platform: ${device.platform}` },
                     timestamp: new Date().toISOString()
