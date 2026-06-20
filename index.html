@@ -140,6 +140,11 @@
                 <h3><i class="fas fa-paper-plane"></i> Send a Message</h3>
             </div>
             <form id="msg-form">
+                <!-- Honeypot: hidden from humans, bots fill it in -->
+                <div class="msg-honeypot" aria-hidden="true">
+                    <label for="msg-website">Website</label>
+                    <input type="text" id="msg-website" name="website" tabindex="-1" autocomplete="off">
+                </div>
                 <div class="msg-field-group" id="msg-user-grp">
                     <label for="msg-user">User</label>
                     <input type="text" id="msg-user" placeholder="Temporary, only for this message" autocomplete="off">
@@ -156,10 +161,11 @@
                     <label for="msg-message">Message</label>
                     <textarea id="msg-message" rows="4" required></textarea>
                 </div>
+                <p class="msg-privacy-notice"><i class="fas fa-shield-halved"></i> For security, basic device info is logged with your message.</p>
                 <div class="msg-actions">
                     <button type="button" class="msg-btn msg-btn-back" id="msg-back"><i class="fas fa-arrow-left"></i>
                         Back</button>
-                    <button type="submit" class="msg-btn msg-btn-send"><i class="fas fa-paper-plane"></i> Send</button>
+                    <button type="submit" class="msg-btn msg-btn-send" id="msg-send-btn"><i class="fas fa-paper-plane"></i> <span id="msg-send-text">Send</span></button>
                 </div>
             </form>
         </div>
@@ -167,6 +173,10 @@
 
     <div class="msg-toast" id="msg-toast">
         <i class="fas fa-check-circle"></i> Message sent!
+    </div>
+
+    <div class="msg-toast msg-toast-warn" id="msg-toast-warn">
+        <i class="fas fa-clock"></i> <span id="msg-warn-text">Please wait before sending another message.</span>
     </div>
 
     <div class="custom-cursor">

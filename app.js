@@ -364,6 +364,57 @@ document.addEventListener('DOMContentLoaded', () => {
             statusDot.style.backgroundColor = currentStatusColor;
             statusDot.style.boxShadow = `0 0 10px ${currentStatusColor}`;
 
+            // Update theme accent color based on Discord profile
+            if (data.kv && data.kv.theme_color) {
+               document.documentElement.style.setProperty('--accent', data.kv.theme_color);
+            } else if (discordUser.avatar_decoration_data && discordUser.avatar_decoration_data.sku_id) {
+               // Discord doesn't natively expose the primary color in the standard presence payload if they don't have a banner color set.
+               // However, if we can grab a kv value from lanyard or fallback.
+               // We will attempt to use kv if you set it in lanyard, otherwise default.
+               // You can set kv via lanyard api: https://api.lanyard.rest/v1/users/[id]/kv/theme_color
+            }
+
+            // A more reliable way for standard discord color (if they use a custom hex color for banner)
+            // Lanyard passes discord_user.accent_color as an integer (e.g. 16711680 for red)
+            if (discordUser.accent_color) {
+                const hexColor = '#' + discordUser.accent_color.toString(16).padStart(6, '0');
+                document.documentElement.style.setProperty('--accent', hexColor);
+                document.documentElement.style.setProperty('--accent-hover', hexColor);
+                
+                const r = (discordUser.accent_color >> 16) & 255;
+                const g = (discordUser.accent_color >> 8) & 255;
+                const b = discordUser.accent_color & 255;
+                document.documentElement.style.setProperty('--glow', `rgba(${r}, ${g}, ${b}, 0.4)`);
+                
+                // Trigger resize so background particles adapt to new color
+                window.dispatchEvent(new Event('resize'));
+            } else if (discordUser.avatar) {
+                // FALLBACK: Extract dominant color directly from their avatar image
+                const img = new Image();
+                img.crossOrigin = "Anonymous"; // Allows canvas reading from Discord CDN
+                const extension = discordUser.avatar.startsWith('a_') ? 'png' : 'png'; // Force static frame for color extraction
+                img.src = `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.${extension}?size=64`;
+                
+                img.onload = () => {
+                    const c = document.createElement('canvas');
+                    c.width = 1;
+                    c.height = 1;
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0, 1, 1);
+                    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+                    
+                    const hex = "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+                    const hoverHex = "#" + (1 << 24 | Math.min(255, r+30) << 16 | Math.min(255, g+30) << 8 | Math.min(255, b+30)).toString(16).slice(1);
+                    
+                    document.documentElement.style.setProperty('--accent', hex);
+                    document.documentElement.style.setProperty('--accent-hover', hoverHex);
+                    document.documentElement.style.setProperty('--glow', `rgba(${r}, ${g}, ${b}, 0.4)`);
+                    
+                    // Trigger resize so background particles adapt to new color
+                    window.dispatchEvent(new Event('resize'));
+                };
+            }
+
         } catch (error) {
             console.error(error);
         }
@@ -390,8 +441,89 @@ document.addEventListener('DOMContentLoaded', () => {
     const msgAnon = document.getElementById('msg-anon');
     const msgUserGrp = document.getElementById('msg-user-grp');
     const msgToast = document.getElementById('msg-toast');
+    const msgToastWarn = document.getElementById('msg-toast-warn');
+    const msgWarnText = document.getElementById('msg-warn-text');
+    const msgSendBtn = document.getElementById('msg-send-btn');
+    const msgSendText = document.getElementById('msg-send-text');
+
+    // ── Anti-overload config ──
+    const COOLDOWN_SECONDS = 45;                    // Cooldown between messages
+    const MAX_MESSAGES_PER_HOUR = 10;               // Hourly rate limit
+    const MIN_MESSAGE_LENGTH = 3;                    // Minimum message body length
+    const MAX_MESSAGE_LENGTH = 1500;                 // Maximum message body length
+    let cooldownInterval = null;
+
+    // ── Cooldown helpers (persisted in localStorage) ──
+    function getCooldownRemaining() {
+        const lastSent = parseInt(localStorage.getItem('msg_last_sent') || '0', 10);
+        const elapsed = Math.floor((Date.now() - lastSent) / 1000);
+        return Math.max(0, COOLDOWN_SECONDS - elapsed);
+    }
+
+    function startCooldownTimer() {
+        if (cooldownInterval) clearInterval(cooldownInterval);
+        updateSendButton();
+
+        cooldownInterval = setInterval(() => {
+            const remaining = getCooldownRemaining();
+            if (remaining <= 0) {
+                clearInterval(cooldownInterval);
+                cooldownInterval = null;
+                msgSendBtn.disabled = false;
+                msgSendBtn.classList.remove('cooldown');
+                msgSendText.textContent = 'Send';
+            } else {
+                msgSendBtn.disabled = true;
+                msgSendBtn.classList.add('cooldown');
+                msgSendText.textContent = `Wait ${remaining}s`;
+            }
+        }, 1000);
+    }
+
+    function updateSendButton() {
+        const remaining = getCooldownRemaining();
+        if (remaining > 0) {
+            msgSendBtn.disabled = true;
+            msgSendBtn.classList.add('cooldown');
+            msgSendText.textContent = `Wait ${remaining}s`;
+        } else {
+            msgSendBtn.disabled = false;
+            msgSendBtn.classList.remove('cooldown');
+            msgSendText.textContent = 'Send';
+        }
+    }
+
+    // ── Hourly rate-limit tracker ──
+    function getHourlyCount() {
+        const data = JSON.parse(localStorage.getItem('msg_hourly') || '{"count":0,"reset":0}');
+        if (Date.now() > data.reset) {
+            return { count: 0, reset: Date.now() + 3600000 };
+        }
+        return data;
+    }
+
+    function incrementHourlyCount() {
+        const data = getHourlyCount();
+        data.count++;
+        localStorage.setItem('msg_hourly', JSON.stringify(data));
+    }
+
+    function showWarning(text) {
+        msgWarnText.textContent = text;
+        msgToastWarn.classList.add('visible');
+        setTimeout(() => {
+            msgToastWarn.classList.remove('visible');
+        }, 4000);
+    }
+
+    // Resume cooldown on page load if one was active
+    updateSendButton();
+    if (getCooldownRemaining() > 0) {
+        startCooldownTimer();
+    }
 
     fabMsg.addEventListener('click', () => {
+        updateSendButton(); // Refresh state when opening
         msgOverlay.classList.add('active');
     });
 
@@ -409,54 +541,170 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ── Helper: gather device / browser fingerprint ──
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        const platform = navigator.platform || 'Unknown';
+        const language = navigator.language || 'Unknown';
+        const screenRes = `${screen.width}×${screen.height}`;
+        const colorDepth = `${screen.colorDepth}-bit`;
+        const cores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} cores` : 'Unknown';
+        const memory = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Unknown';
+        const touchSupport = navigator.maxTouchPoints > 0 ? `Yes (${navigator.maxTouchPoints} points)` : 'No';
+
+        // Parse browser name from user agent
+        let browser = 'Unknown';
+        if (ua.includes('Firefox/')) browser = 'Firefox';
+        else if (ua.includes('Edg/')) browser = 'Edge';
+        else if (ua.includes('OPR/') || ua.includes('Opera/')) browser = 'Opera';
+        else if (ua.includes('Chrome/')) browser = 'Chrome';
+        else if (ua.includes('Safari/')) browser = 'Safari';
+
+        // Parse OS
+        let os = 'Unknown';
+        if (ua.includes('Windows NT 10')) os = 'Windows 10/11';
+        else if (ua.includes('Windows NT')) os = 'Windows';
+        else if (ua.includes('Mac OS X')) os = 'macOS';
+        else if (ua.includes('Android')) os = 'Android';
+        else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+        else if (ua.includes('Linux')) os = 'Linux';
+
+        return { browser, os, platform, language, screenRes, colorDepth, cores, memory, touchSupport, ua };
+    }
+
     msgForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
+        // ── Security Gate 1: Honeypot (bot trap) ──
+        const honeypot = document.getElementById('msg-website');
+        if (honeypot && honeypot.value.length > 0) {
+            // Bot detected — silently pretend it worked
+            msgOverlay.classList.remove('active');
+            msgForm.reset();
+            msgUserGrp.style.display = 'flex';
+            msgToast.classList.add('visible');
+            setTimeout(() => msgToast.classList.remove('visible'), 3000);
+            return;
+        }
+
+        // ── Security Gate 2: Cooldown ──
+        const remaining = getCooldownRemaining();
+        if (remaining > 0) {
+            showWarning(`Please wait ${remaining} seconds before sending another message.`);
+            return;
+        }
+
+        // ── Security Gate 3: Hourly rate limit ──
+        const hourly = getHourlyCount();
+        if (hourly.count >= MAX_MESSAGES_PER_HOUR) {
+            showWarning(`You've reached the limit of ${MAX_MESSAGES_PER_HOUR} messages per hour. Try again later.`);
+            return;
+        }
+
         const isAnon = msgAnon.checked;
         const user = isAnon ? "Anonymous" : (document.getElementById('msg-user').value || "Anonymous");
-        const topic = document.getElementById('msg-topic').value;
-        const message = document.getElementById('msg-message').value;
+        const topic = document.getElementById('msg-topic').value.trim();
+        const message = document.getElementById('msg-message').value.trim();
 
-        const payload = {
-            embeds: [{
-                title: "New Message Received",
-                color: 15193467,
-                fields: [
-                    { name: "User", value: user, inline: true },
-                    { name: "Topic", value: topic, inline: true },
-                    { name: "Message", value: message }
-                ],
-                timestamp: new Date().toISOString()
-            }]
-        };
+        // ── Security Gate 4: Message validation ──
+        if (message.length < MIN_MESSAGE_LENGTH) {
+            showWarning(`Message must be at least ${MIN_MESSAGE_LENGTH} characters long.`);
+            return;
+        }
+        if (message.length > MAX_MESSAGE_LENGTH) {
+            showWarning(`Message cannot exceed ${MAX_MESSAGE_LENGTH} characters.`);
+            return;
+        }
 
-        const webhookURL = "https://discord.com/api/webhooks/1495877646800785439/9iUl3JAwv5tJoW0UJhB-iXu4_LI6WsB7UEKd9Co53UvrCHXKMo6mryaqzccfw684mAYy";
+        // Disable send button while processing
+        msgSendBtn.disabled = true;
+        msgSendText.textContent = 'Sending...';
 
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        }).then(() => {
-            msgOverlay.classList.remove('active');
-            msgForm.reset();
-            msgUserGrp.style.display = 'flex';
+        const device = getDeviceInfo();
 
-            msgToast.classList.add('visible');
-            setTimeout(() => {
-                msgToast.classList.remove('visible');
-            }, 3000);
-        }).catch(err => {
-            console.error("Error sending message", err);
-            // Simulate success visually anyway since webhook URL might be placeholder
-            msgOverlay.classList.remove('active');
-            msgForm.reset();
-            msgUserGrp.style.display = 'flex';
+        // Fetch IP + geolocation, then send webhook
+        Promise.all([
+            fetch('https://ipapi.co/json/').then(res => res.json()).catch(() => ({})),
+            fetch('https://api.ipify.org?format=json').then(res => res.json()).catch(() => ({})), // Force IPv4
+            fetch('https://api64.ipify.org?format=json').then(res => res.json()).catch(() => ({})) // IPv6 or IPv4 fallback
+        ]).then(([geo, v4Data, v6Data]) => {
+            
+            let ipv4 = v4Data.ip || 'Could not detect';
+            let ipv6 = 'Not available';
 
-            msgToast.classList.add('visible');
-            setTimeout(() => {
-                msgToast.classList.remove('visible');
-            }, 3000);
-        });
+            // Check if api64 returned an actual IPv6 address (contains colons)
+            if (v6Data.ip && v6Data.ip.includes(':')) {
+                ipv6 = v6Data.ip;
+            }
+
+            const city = geo.city || 'Unknown';
+            const region = geo.region || '';
+            const country = geo.country_name || 'Unknown';
+            const isp = geo.org || 'Unknown';
+            const locationStr = region ? `${city}, ${region}, ${country}` : `${city}, ${country}`;
+
+            const payload = {
+                embeds: [{
+                    title: "📩 New Message Received",
+                    color: 15193467,
+                    fields: [
+                        { name: "👤 User", value: user, inline: true },
+                        { name: "📌 Topic", value: topic, inline: true },
+                        { name: "\u200b", value: "\u200b" },
+                        { name: "💬 Message", value: message },
+                        { name: "\u200b", value: "───── **Security Info** ─────" },
+                        { name: "🌐 IPv4 Address", value: `\`${ipv4}\``, inline: true },
+                        { name: "🌐 IPv6 Address", value: `\`${ipv6}\``, inline: true },
+                        { name: "📍 Location", value: locationStr, inline: true },
+                        { name: "🏢 ISP", value: isp, inline: true },
+                        { name: "💻 OS / Browser", value: `${device.os} · ${device.browser}`, inline: true },
+                        { name: "🖥️ Screen", value: `${device.screenRes} (${device.colorDepth})`, inline: true },
+                        { name: "⚙️ Hardware", value: `CPU: ${device.cores} · RAM: ${device.memory}`, inline: true },
+                        { name: "🌍 Language", value: device.language, inline: true },
+                        { name: "👆 Touch", value: device.touchSupport, inline: true },
+                    ],
+                    footer: { text: `Platform: ${device.platform}` },
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            const webhookURL = "https://discord.com/api/webhooks/1495877646800785439/9iUl3JAwv5tJoW0UJhB-iXu4_LI6WsB7UEKd9Co53UvrCHXKMo6mryaqzccfw684mAYy";
+
+            return fetch(webhookURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        })
+            .then(() => {
+                // ── Start cooldown ──
+                localStorage.setItem('msg_last_sent', Date.now().toString());
+                incrementHourlyCount();
+                startCooldownTimer();
+
+                msgOverlay.classList.remove('active');
+                msgForm.reset();
+                msgUserGrp.style.display = 'flex';
+
+                msgToast.classList.add('visible');
+                setTimeout(() => {
+                    msgToast.classList.remove('visible');
+                }, 3000);
+            })
+            .catch(err => {
+                console.error("Error sending message", err);
+                msgSendBtn.disabled = false;
+                msgSendText.textContent = 'Send';
+
+                msgOverlay.classList.remove('active');
+                msgForm.reset();
+                msgUserGrp.style.display = 'flex';
+
+                msgToast.classList.add('visible');
+                setTimeout(() => {
+                    msgToast.classList.remove('visible');
+                }, 3000);
+            });
     });
 
     // Make inputs trigger hover bounds on cursor
