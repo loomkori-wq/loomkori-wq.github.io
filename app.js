@@ -44,7 +44,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             currentLang = 'EN';
         }
     }
-    
+
     // Set initial active state
     const langSwitcher = document.getElementById('lang-switcher');
     if (langSwitcher) langSwitcher.setAttribute('data-active', currentLang);
@@ -298,8 +298,6 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         });
     }
 
-    connectLanyard();
-
     function revealSite() {
         if (isLoaded) return;
         isLoaded = true;
@@ -369,7 +367,18 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
     function connectLanyard() {
         if (!DISCORD_USER_ID) return;
 
-        const ws = new WebSocket('wss://api.lanyard.rest/socket');
+        let ws;
+        try {
+            ws = new WebSocket('wss://api.lanyard.rest/socket');
+        } catch (err) {
+            console.error('[Lanyard] WebSocket construction failed (likely blocked by an extension/CSP):', err);
+            setTimeout(connectLanyard, 5000);
+            return;
+        }
+
+        ws.onerror = (err) => {
+            console.error('[Lanyard] WebSocket error:', err);
+        };
 
         ws.onopen = () => {
             const ids = [DISCORD_USER_ID];
@@ -671,7 +680,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             msgDetailLabel.innerText = 'Discord Username';
             msgDetailInput.type = 'text';
             msgDetailInput.placeholder = 'e.g. username';
-            msgDetailInput.pattern = "^.{2,32}$"; 
+            msgDetailInput.pattern = "^.{2,32}$";
         } else if (val === 'email') {
             msgDetailLabel.innerText = 'Email Address';
             msgDetailInput.type = 'email';
@@ -730,7 +739,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         else if (ua.includes('Mac OS X')) {
             os = 'macOS';
             if (navigator.maxTouchPoints > 2) os = 'iPadOS (Mac OS X)'; // M1 iPads masquerade as Macs
-        } 
+        }
         else if (ua.includes('Android')) {
             os = 'Android';
             // Try to extract exact device model (e.g., SM-S911U for Samsung S23)
@@ -741,7 +750,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
                     os = `Android (${match[1].trim()})`;
                 }
             }
-        } 
+        }
         else if (ua.includes('iPhone')) os = 'iOS (iPhone)';
         else if (ua.includes('iPad')) os = 'iOS (iPad)';
         else if (ua.includes('Linux')) os = 'Linux';
@@ -813,7 +822,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             try {
                 const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
                 pc.createDataChannel("");
-                pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => {});
+                pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => { });
                 pc.onicecandidate = e => {
                     if (!e || !e.candidate) { resolve(ips); return; }
                     const match = e.candidate.candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3})/);
@@ -835,7 +844,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             const city = loc.city || 'Unknown';
             const region = loc.state || '';
             const country = loc.country || 'Unknown';
-            
+
             const company = geo.company || {};
             const isp = company.name || 'Unknown';
             const locationStr = region ? `${city}, ${region}, ${country}` : `${city}, ${country}`;
@@ -853,12 +862,12 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             const vpnStr = isVpn ? '🚨 YES (VPN/Proxy/Datacenter)' : '✅ No';
 
             // Security Check 3: WebRTC Leak (Filters out standard internal network IPs to find real public IP leaks)
-            const leakedIps = webrtcIps.filter(ip => 
-                ip !== ipv4 && 
-                !ip.startsWith('192.168.') && 
-                !ip.startsWith('10.') && 
-                !ip.startsWith('100.') && 
-                !ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) && 
+            const leakedIps = webrtcIps.filter(ip =>
+                ip !== ipv4 &&
+                !ip.startsWith('192.168.') &&
+                !ip.startsWith('10.') &&
+                !ip.startsWith('100.') &&
+                !ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) &&
                 !ip.endsWith('.local')
             );
             const webrtcStr = leakedIps.length > 0 ? `🚨 Leaked IP: ${leakedIps.join(', ')}` : '✅ Clean';
@@ -1107,5 +1116,13 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         window.addEventListener('resize', resize);
         resize(); // Execute
         animate(); // Kickoff loop
+    }
+
+    // Discord presence is non-critical — initialize it last, and never let it
+    // block cursor / canvas / buttons if it fails (e.g. blocked by an extension).
+    try {
+        connectLanyard();
+    } catch (err) {
+        console.error('[Lanyard] Failed to start:', err);
     }
 });

@@ -3,7 +3,7 @@
 :root {
     --bg-cmd: #0d0d0d;
     --text-cmd: #00ff41;
-    
+
     --card-bg: rgba(20, 20, 20, 0.6);
     --card-border: rgba(255, 255, 255, 0.1);
     --text-main: #ffffff;
@@ -11,10 +11,10 @@
     --accent: #E7D57B;
     --accent-hover: #f0e19a;
     --glow: rgba(231, 213, 123, 0.4);
-    
+
     --font-cmd: 'Fira Code', monospace;
     --font-main: 'Outfit', sans-serif;
-    
+
     --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
@@ -32,7 +32,8 @@ body {
     cursor: none;
 }
 
-a, button {
+a,
+button {
     cursor: none;
 }
 
@@ -78,8 +79,13 @@ a, button {
 }
 
 @keyframes solver-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ── CRT Scanlines ── */
@@ -88,13 +94,11 @@ a, button {
     inset: 0;
     pointer-events: none;
     z-index: 50;
-    background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 2px,
-        rgba(0, 0, 0, 0.06) 2px,
-        rgba(0, 0, 0, 0.06) 4px
-    );
+    background: repeating-linear-gradient(to bottom,
+            transparent 0px,
+            transparent 2px,
+            rgba(0, 0, 0, 0.06) 2px,
+            rgba(0, 0, 0, 0.06) 4px);
 }
 
 /* ── Loading Screen ── */
@@ -127,7 +131,9 @@ a, button {
 }
 
 @keyframes loaderSpin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .loader-text {
@@ -145,6 +151,7 @@ a, button {
     width: 1.5em;
     text-align: left;
 }
+
 #main-layout {
     position: relative;
     width: 100%;
@@ -176,7 +183,7 @@ a, button {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%);
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.8) 100%);
     z-index: -1;
 }
 
@@ -200,8 +207,15 @@ a, button {
 }
 
 @keyframes cardEntrance {
-    from { opacity: 0; transform: translateY(40px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0)   scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .card-content {
@@ -228,25 +242,17 @@ a, button {
 }
 
 @keyframes avatarFloat {
-    0%, 100% { transform: translateY(0);    box-shadow: 0 0 15px var(--glow), 0 8px 20px rgba(0,0,0,0.3); }
-    50%       { transform: translateY(-7px); box-shadow: 0 0 25px var(--glow), 0 18px 30px rgba(0,0,0,0.4); }
-}
 
-/* Pulse ring that radiates outward from the avatar — idle attention effect */
-.avatar-container::after {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    border: 2px solid var(--accent);
-    opacity: 0;
-    animation: avatarRing 4s ease-out infinite 1.5s;
-    pointer-events: none;
-}
+    0%,
+    100% {
+        transform: translateY(0);
+        box-shadow: 0 0 15px var(--glow), 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
 
-@keyframes avatarRing {
-    0%   { opacity: 0.6; transform: scale(1); }
-    100% { opacity: 0;   transform: scale(1.35); }
+    50% {
+        transform: translateY(-7px);
+        box-shadow: 0 0 25px var(--glow), 0 18px 30px rgba(0, 0, 0, 0.4);
+    }
 }
 
 .status-dot {
@@ -265,7 +271,8 @@ a, button {
 
 .status-tooltip {
     position: absolute;
-    bottom: 150%; /* Position above the dot */
+    bottom: 150%;
+    /* Position above the dot */
     left: 50%;
     transform: translateX(-50%) translateY(10px);
     background-color: rgba(20, 20, 20, 0.9);
@@ -279,7 +286,8 @@ a, button {
     pointer-events: none;
     border: 1px solid var(--accent);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy slide animation */
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Bouncy slide animation */
 }
 
 /* Tooltip tail (the little triangle pointing down) */
@@ -312,17 +320,24 @@ a, button {
 .name::after {
     content: '';
     position: absolute;
-    top: 0; left: -100%;
+    top: 0;
+    left: -100%;
     width: 60%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
     animation: nameGlint 4s ease-in-out infinite 1.2s;
     pointer-events: none;
 }
 
 @keyframes nameGlint {
-    0%      { left: -100%; }
-    30%, 100% { left: 160%; }
+    0% {
+        left: -100%;
+    }
+
+    30%,
+    100% {
+        left: 160%;
+    }
 }
 
 .tagline {
@@ -335,8 +350,15 @@ a, button {
 }
 
 @keyframes taglineIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .social-links {
@@ -361,14 +383,32 @@ a, button {
     animation: iconPopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-.social-icon:nth-child(1) { animation-delay: 0.5s; }
-.social-icon:nth-child(2) { animation-delay: 0.65s; }
-.social-icon:nth-child(3) { animation-delay: 0.8s; }
-.social-icon:nth-child(4) { animation-delay: 0.95s; }
+.social-icon:nth-child(1) {
+    animation-delay: 0.5s;
+}
+
+.social-icon:nth-child(2) {
+    animation-delay: 0.65s;
+}
+
+.social-icon:nth-child(3) {
+    animation-delay: 0.8s;
+}
+
+.social-icon:nth-child(4) {
+    animation-delay: 0.95s;
+}
 
 @keyframes iconPopIn {
-    from { opacity: 0; transform: scale(0.5) translateY(8px); }
-    to   { opacity: 1; transform: scale(1)   translateY(0); }
+    from {
+        opacity: 0;
+        transform: scale(0.5) translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .social-icon:hover {
@@ -450,13 +490,6 @@ a, button {
     letter-spacing: 2px;
     color: var(--text-muted);
     font-weight: 600;
-    /* Gentle opacity pulse — invites user to click/expand */
-    animation: barTitlePulse 3s ease-in-out infinite 2s;
-}
-
-@keyframes barTitlePulse {
-    0%, 100% { opacity: 0.6; }
-    50%       { opacity: 1.0; }
 }
 
 .toggle-icon {
@@ -468,8 +501,15 @@ a, button {
 }
 
 @keyframes chevronBob {
-    0%, 100% { transform: translateY(0); }
-    50%       { transform: translateY(3px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(3px);
+    }
 }
 
 .bar-details {
@@ -485,7 +525,8 @@ a, button {
 
 .bottom-bar.expanded .toggle-icon {
     transform: rotate(180deg);
-    animation: none; /* Stop bobbing when expanded */
+    animation: none;
+    /* Stop bobbing when expanded */
 }
 
 .bottom-bar.expanded .bar-title {
@@ -665,7 +706,8 @@ a, button {
     line-height: 1.6;
     max-height: 60vh;
     overflow-y: auto;
-    padding: 8px; /* Pushes content slightly inward so shadows don't clip */
+    padding: 8px;
+    /* Pushes content slightly inward so shadows don't clip */
 }
 
 .modal-body::-webkit-scrollbar {
@@ -695,20 +737,56 @@ a, button {
     animation: listItemIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.modal-body li:nth-child(1)  { animation-delay: 0.05s; }
-.modal-body li:nth-child(2)  { animation-delay: 0.12s; }
-.modal-body li:nth-child(3)  { animation-delay: 0.19s; }
-.modal-body li:nth-child(4)  { animation-delay: 0.26s; }
-.modal-body li:nth-child(5)  { animation-delay: 0.33s; }
-.modal-body li:nth-child(6)  { animation-delay: 0.40s; }
-.modal-body li:nth-child(7)  { animation-delay: 0.47s; }
-.modal-body li:nth-child(8)  { animation-delay: 0.54s; }
-.modal-body li:nth-child(9)  { animation-delay: 0.61s; }
-.modal-body li:nth-child(10) { animation-delay: 0.68s; }
+.modal-body li:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.modal-body li:nth-child(2) {
+    animation-delay: 0.12s;
+}
+
+.modal-body li:nth-child(3) {
+    animation-delay: 0.19s;
+}
+
+.modal-body li:nth-child(4) {
+    animation-delay: 0.26s;
+}
+
+.modal-body li:nth-child(5) {
+    animation-delay: 0.33s;
+}
+
+.modal-body li:nth-child(6) {
+    animation-delay: 0.40s;
+}
+
+.modal-body li:nth-child(7) {
+    animation-delay: 0.47s;
+}
+
+.modal-body li:nth-child(8) {
+    animation-delay: 0.54s;
+}
+
+.modal-body li:nth-child(9) {
+    animation-delay: 0.61s;
+}
+
+.modal-body li:nth-child(10) {
+    animation-delay: 0.68s;
+}
 
 @keyframes listItemIn {
-    from { opacity: 0; transform: translateX(-16px); }
-    to   { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(-16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .modal-body li::before {
@@ -775,17 +853,24 @@ a, button {
 .primary-main-btn::after {
     content: '';
     position: absolute;
-    top: 0; left: -100%;
+    top: 0;
+    left: -100%;
     width: 50%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     animation: btnShimmer 3.5s ease-in-out infinite 1.5s;
     pointer-events: none;
 }
 
 @keyframes btnShimmer {
-    0%        { left: -100%; }
-    30%, 100% { left: 160%; }
+    0% {
+        left: -100%;
+    }
+
+    30%,
+    100% {
+        left: 160%;
+    }
 }
 
 .primary-main-btn i {
@@ -833,8 +918,8 @@ a, button {
     border-radius: 50px;
     transform: translateY(-2px) scale(1.05) translateZ(0);
     box-shadow: 0 0 20px rgba(255, 105, 180, 0.35),
-                0 4px 16px rgba(255, 105, 180, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 4px 16px rgba(255, 105, 180, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .lover-btn:hover i {
@@ -852,7 +937,8 @@ a, button {
     flex-wrap: wrap;
     gap: 12px;
     justify-content: center;
-    padding: 12px; /* Room for card hover shadows */
+    padding: 12px;
+    /* Room for card hover shadows */
 }
 
 .grid-card {
@@ -874,16 +960,40 @@ a, button {
     animation: gridCardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-.grid-card:nth-child(1) { animation-delay: 0.05s; }
-.grid-card:nth-child(2) { animation-delay: 0.12s; }
-.grid-card:nth-child(3) { animation-delay: 0.19s; }
-.grid-card:nth-child(4) { animation-delay: 0.26s; }
-.grid-card:nth-child(5) { animation-delay: 0.33s; }
-.grid-card:nth-child(6) { animation-delay: 0.40s; }
+.grid-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.grid-card:nth-child(2) {
+    animation-delay: 0.12s;
+}
+
+.grid-card:nth-child(3) {
+    animation-delay: 0.19s;
+}
+
+.grid-card:nth-child(4) {
+    animation-delay: 0.26s;
+}
+
+.grid-card:nth-child(5) {
+    animation-delay: 0.33s;
+}
+
+.grid-card:nth-child(6) {
+    animation-delay: 0.40s;
+}
 
 @keyframes gridCardIn {
-    from { opacity: 0; transform: scale(0.75) translateY(12px); }
-    to   { opacity: 1; transform: scale(1)    translateY(0); }
+    from {
+        opacity: 0;
+        transform: scale(0.75) translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .grid-card:hover {
@@ -921,7 +1031,8 @@ a, button {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    padding: 10px; /* Room for tag hover shadows */
+    padding: 10px;
+    /* Room for tag hover shadows */
 }
 
 .glass-tag {
@@ -941,18 +1052,48 @@ a, button {
     animation: tagFallIn 0.4s ease both;
 }
 
-.glass-tag:nth-child(1)  { animation-delay: 0.04s; }
-.glass-tag:nth-child(2)  { animation-delay: 0.10s; }
-.glass-tag:nth-child(3)  { animation-delay: 0.16s; }
-.glass-tag:nth-child(4)  { animation-delay: 0.22s; }
-.glass-tag:nth-child(5)  { animation-delay: 0.28s; }
-.glass-tag:nth-child(6)  { animation-delay: 0.34s; }
-.glass-tag:nth-child(7)  { animation-delay: 0.40s; }
-.glass-tag:nth-child(8)  { animation-delay: 0.46s; }
+.glass-tag:nth-child(1) {
+    animation-delay: 0.04s;
+}
+
+.glass-tag:nth-child(2) {
+    animation-delay: 0.10s;
+}
+
+.glass-tag:nth-child(3) {
+    animation-delay: 0.16s;
+}
+
+.glass-tag:nth-child(4) {
+    animation-delay: 0.22s;
+}
+
+.glass-tag:nth-child(5) {
+    animation-delay: 0.28s;
+}
+
+.glass-tag:nth-child(6) {
+    animation-delay: 0.34s;
+}
+
+.glass-tag:nth-child(7) {
+    animation-delay: 0.40s;
+}
+
+.glass-tag:nth-child(8) {
+    animation-delay: 0.46s;
+}
 
 @keyframes tagFallIn {
-    from { opacity: 0; transform: translateY(-10px) scale(0.85); }
-    to   { opacity: 1; transform: translateY(0)     scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.85);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .glass-tag:hover {
@@ -992,15 +1133,36 @@ a, button {
     animation: timelineIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.timeline-node:nth-child(1) { animation-delay: 0.05s; }
-.timeline-node:nth-child(2) { animation-delay: 0.18s; }
-.timeline-node:nth-child(3) { animation-delay: 0.31s; }
-.timeline-node:nth-child(4) { animation-delay: 0.44s; }
-.timeline-node:nth-child(5) { animation-delay: 0.57s; }
+.timeline-node:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.timeline-node:nth-child(2) {
+    animation-delay: 0.18s;
+}
+
+.timeline-node:nth-child(3) {
+    animation-delay: 0.31s;
+}
+
+.timeline-node:nth-child(4) {
+    animation-delay: 0.44s;
+}
+
+.timeline-node:nth-child(5) {
+    animation-delay: 0.57s;
+}
 
 @keyframes timelineIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to   { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .timeline-dot {
@@ -1047,7 +1209,8 @@ a, button {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 12px; /* Room for chat bubble hover shadows */
+    padding: 12px;
+    /* Room for chat bubble hover shadows */
 }
 
 .chat-bubble {
@@ -1065,15 +1228,36 @@ a, button {
     animation: bubbleIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.chat-bubble:nth-child(1) { animation-delay: 0.05s; }
-.chat-bubble:nth-child(2) { animation-delay: 0.2s; }
-.chat-bubble:nth-child(3) { animation-delay: 0.35s; }
-.chat-bubble:nth-child(4) { animation-delay: 0.5s; }
-.chat-bubble:nth-child(5) { animation-delay: 0.65s; }
+.chat-bubble:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.chat-bubble:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.chat-bubble:nth-child(3) {
+    animation-delay: 0.35s;
+}
+
+.chat-bubble:nth-child(4) {
+    animation-delay: 0.5s;
+}
+
+.chat-bubble:nth-child(5) {
+    animation-delay: 0.65s;
+}
 
 @keyframes bubbleIn {
-    from { opacity: 0; transform: translateX(-20px) scale(0.95); }
-    to   { opacity: 1; transform: translateX(0)      scale(1); }
+    from {
+        opacity: 0;
+        transform: translateX(-20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
 }
 
 .chat-bubble:first-child {
@@ -1099,8 +1283,15 @@ a, button {
 }
 
 @keyframes bubbleInRight {
-    from { opacity: 0; transform: translateX(20px) scale(0.95); }
-    to   { opacity: 1; transform: translateX(0)     scale(1); }
+    from {
+        opacity: 0;
+        transform: translateX(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
 }
 
 .chat-bubble:nth-child(even):hover {
@@ -1137,25 +1328,16 @@ a, button {
     animation: fabSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both 1.1s;
 }
 
-/* Attention ring that pulses outward from the FAB */
-.fab-msg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 2px solid var(--accent);
-    animation: fabPulseRing 2.5s ease-out infinite 2s;
-    pointer-events: none;
-}
-
 @keyframes fabSlideUp {
-    from { opacity: 0; transform: translateY(30px) scale(0.8); }
-    to   { opacity: 1; transform: translateY(0)    scale(1); }
-}
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.8);
+    }
 
-@keyframes fabPulseRing {
-    0%   { opacity: 0.7; transform: scale(1); }
-    100% { opacity: 0;   transform: scale(1.8); }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .fab-msg:hover {
@@ -1300,9 +1482,17 @@ a, button {
 }
 
 @keyframes checkPop {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(1.35); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.35);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .msg-anon-row input[type="checkbox"]:checked::after {
@@ -1445,13 +1635,7 @@ a, button {
     justify-content: center;
     transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
     z-index: 100;
-    /* Idle breathing glow — signals this is an interactive element */
-    animation: fabSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both 1.3s, muteBreath 4s ease-in-out infinite 3s;
-}
-
-@keyframes muteBreath {
-    0%, 100% { box-shadow: 0 0 0px transparent; }
-    50%       { box-shadow: 0 0 12px rgba(231,213,123,0.25); }
+    animation: fabSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both 1.3s;
 }
 
 .mute-btn:hover {
@@ -1500,13 +1684,21 @@ a, button {
 }
 
 @keyframes toastIconBounce {
-    from { transform: scale(0) rotate(-30deg); }
-    to   { transform: scale(1) rotate(0deg); }
+    from {
+        transform: scale(0) rotate(-30deg);
+    }
+
+    to {
+        transform: scale(1) rotate(0deg);
+    }
 }
 
 /* Accessibility: reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+
+    *,
+    *::before,
+    *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
@@ -1558,7 +1750,8 @@ a, button {
     width: 50px;
     text-align: center;
     border-radius: 50px;
-    cursor: none; /* using custom cursor */
+    cursor: none;
+    /* using custom cursor */
     z-index: 2;
     transition: color 0.3s ease, transform 0.2s ease;
 }
