@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loom | Profile</title>
-    <link rel="stylesheet" href="style.css?v=1.3">
+    <link rel="stylesheet" href="style.css?v=1.4">
     <link
         href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap"
         rel="stylesheet">
@@ -34,6 +34,7 @@
         </button>
 
 
+        <main class="profile-card">
             <!-- Decorative Ribbons -->
             <div class="ribbon-decorations" aria-hidden="true">
                 <!-- Top Ribbon -->
@@ -186,6 +187,7 @@
                     <label for="msg-contact-method">Reply-To Method</label>
                     <select id="msg-contact-method" required>
                         <option value="" disabled selected>Select a contact method...</option>
+                        <option value="name">Just a Name (no reply needed)</option>
                         <option value="discord">Discord</option>
                         <option value="email">Email Address</option>
                         <option value="phone">Phone Number</option>
@@ -243,7 +245,7 @@
             </g>
         </svg>
     </div>
-    <script src="app.js?v=1.3"></script>
+    <script src="app.js?v=1.4"></script>
 </body>
 
 </html>

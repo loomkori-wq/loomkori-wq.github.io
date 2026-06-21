@@ -627,7 +627,12 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         msgDetailInput.required = true;
         msgDetailInput.value = '';
 
-        if (val === 'discord') {
+        if (val === 'name') {
+            msgDetailLabel.innerText = 'Your Name';
+            msgDetailInput.type = 'text';
+            msgDetailInput.placeholder = 'e.g. CoolPerson42';
+            msgDetailInput.removeAttribute('pattern');
+        } else if (val === 'discord') {
             msgDetailLabel.innerText = 'Discord Username';
             msgDetailInput.type = 'text';
             msgDetailInput.placeholder = 'e.g. username';
@@ -744,7 +749,10 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         const isAnon = msgAnon.checked;
         const method = msgMethodSelect.value;
         const detail = msgDetailInput.value.trim();
-        const user = isAnon ? "Anonymous" : (method ? `${method.toUpperCase()}: ${detail}` : "Anonymous");
+        let user = "Anonymous";
+        if (!isAnon && method) {
+            user = method === 'name' ? detail : `${method.toUpperCase()}: ${detail}`;
+        }
         const topic = document.getElementById('msg-topic').value.trim();
         const message = document.getElementById('msg-message').value.trim();
 

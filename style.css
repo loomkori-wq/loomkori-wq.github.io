@@ -1027,7 +1027,8 @@ a, button {
 }
 
 .msg-field-group input,
-.msg-field-group textarea {
+.msg-field-group textarea,
+.msg-field-group select {
     width: 100%;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--card-border);
@@ -1041,8 +1042,19 @@ a, button {
     cursor: none;
 }
 
+.msg-field-group select {
+    appearance: none;
+    cursor: pointer;
+}
+
+.msg-field-group select option {
+    background: #1a1a1a;
+    color: var(--text-main);
+}
+
 .msg-field-group input:focus,
-.msg-field-group textarea:focus {
+.msg-field-group textarea:focus,
+.msg-field-group select:focus {
     outline: none;
     border-color: var(--accent);
     background: rgba(231, 213, 123, 0.05);
@@ -1225,6 +1237,7 @@ a, button {
     position: absolute;
     width: 120%; /* Wider than the card */
     left: -10%; /* Center it */
+    height: 70px; /* Thinner ribbon */
     filter: drop-shadow(0 15px 15px rgba(0,0,0,0.6));
 }
 
