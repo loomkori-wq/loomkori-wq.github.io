@@ -365,20 +365,21 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             }
 
             if (message.t === 'INIT_STATE') {
+                console.log('[Lanyard] INIT_STATE received:', JSON.stringify(message.d).substring(0, 200));
                 if (message.d[DISCORD_USER_ID]) {
-                    // subscribe_to_ids used
                     updateDiscordUI(message.d[DISCORD_USER_ID], false);
                     if (message.d[LOVER_DISCORD_ID]) {
+                        console.log('[Lanyard] Lover data found in INIT_STATE');
                         updateDiscordUI(message.d[LOVER_DISCORD_ID], true);
                     }
-                } else {
-                    // subscribe_to_id used
+                } else if (message.d.discord_user) {
                     updateDiscordUI(message.d, false);
                 }
             } else if (message.t === 'PRESENCE_UPDATE') {
-                if (message.d.discord_user.id === LOVER_DISCORD_ID) {
+                const uid = message.d.discord_user?.id;
+                if (uid === LOVER_DISCORD_ID) {
                     updateDiscordUI(message.d, true);
-                } else if (message.d.discord_user.id === DISCORD_USER_ID) {
+                } else if (uid === DISCORD_USER_ID) {
                     updateDiscordUI(message.d, false);
                 }
             }
@@ -387,9 +388,23 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         ws.onclose = () => {
             setTimeout(connectLanyard, 5000);
         };
+
+        // REST API fallback — always fetch lover data via HTTP too
+        if (LOVER_DISCORD_ID) {
+            fetch(`https://api.lanyard.rest/v1/users/${LOVER_DISCORD_ID}`)
+                .then(r => r.json())
+                .then(json => {
+                    if (json.success && json.data) {
+                        console.log('[Lanyard] REST fallback for lover loaded OK');
+                        updateDiscordUI(json.data, true);
+                    }
+                })
+                .catch(e => console.error('[Lanyard] REST fallback error:', e));
+        }
     }
 
     function updateDiscordUI(data, isLover = false) {
+        console.log(`[Lanyard] updateDiscordUI called, isLover=${isLover}, user=${data.discord_user?.username}`);
         if (isLover) {
             loverPresenceData = data;
             if (document.getElementById('lover-card')) {
