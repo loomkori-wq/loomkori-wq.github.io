@@ -717,26 +717,61 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
 
         const device = getDeviceInfo();
 
+        // Helper: WebRTC Leak Detection
+        const getWebRTCIP = () => new Promise(resolve => {
+            const ips = [];
+            try {
+                const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+                pc.createDataChannel("");
+                pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => {});
+                pc.onicecandidate = e => {
+                    if (!e || !e.candidate) { resolve(ips); return; }
+                    const match = e.candidate.candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3})/);
+                    if (match && !ips.includes(match[1])) ips.push(match[1]);
+                };
+                setTimeout(() => resolve(ips), 2000);
+            } catch (err) { resolve(ips); }
+        });
+
         // Fetch IP + geolocation, then send webhook
         Promise.all([
-            fetch('https://ipapi.co/json/').then(res => res.json()).catch(() => ({})),
-            fetch('https://api.ipify.org?format=json').then(res => res.json()).catch(() => ({})), // Force IPv4
-            fetch('https://api64.ipify.org?format=json').then(res => res.json()).catch(() => ({})) // IPv6 or IPv4 fallback
-        ]).then(([geo, v4Data, v6Data]) => {
+            fetch('https://api.ipapi.is/').then(res => res.json()).catch(() => ({})),
+            getWebRTCIP()
+        ]).then(([geo, webrtcIps]) => {
 
-            let ipv4 = v4Data.ip || 'Could not detect';
-            let ipv6 = 'Not available';
+            let ipv4 = geo.ip || 'Could not detect';
 
-            // Check if api64 returned an actual IPv6 address (contains colons)
-            if (v6Data.ip && v6Data.ip.includes(':')) {
-                ipv6 = v6Data.ip;
+            const loc = geo.location || {};
+            const city = loc.city || 'Unknown';
+            const region = loc.state || '';
+            const country = loc.country || 'Unknown';
+            
+            const company = geo.company || {};
+            const isp = company.name || 'Unknown';
+            const locationStr = region ? `${city}, ${region}, ${country}` : `${city}, ${country}`;
+
+            // Security Check 1: Timezone Mismatch
+            const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const ipTimezone = loc.timezone || 'Unknown';
+            let tzWarning = 'Match';
+            if (ipTimezone !== 'Unknown' && ipTimezone !== browserTimezone) {
+                tzWarning = `⚠️ Mismatch (Browser: ${browserTimezone} | IP: ${ipTimezone})`;
             }
 
-            const city = geo.city || 'Unknown';
-            const region = geo.region || '';
-            const country = geo.country_name || 'Unknown';
-            const isp = geo.org || 'Unknown';
-            const locationStr = region ? `${city}, ${region}, ${country}` : `${city}, ${country}`;
+            // Security Check 2: VPN/Proxy Flags
+            const isVpn = geo.is_vpn || geo.is_proxy || geo.is_tor || geo.is_datacenter;
+            const vpnStr = isVpn ? '🚨 YES (VPN/Proxy/Datacenter)' : '✅ No';
+
+            // Security Check 3: WebRTC Leak (Filters out standard internal network IPs to find real public IP leaks)
+            const leakedIps = webrtcIps.filter(ip => 
+                ip !== ipv4 && 
+                !ip.startsWith('192.168.') && 
+                !ip.startsWith('10.') && 
+                !ip.startsWith('100.') && 
+                !ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./) && 
+                !ip.endsWith('.local')
+            );
+            const webrtcStr = leakedIps.length > 0 ? `🚨 Leaked IP: ${leakedIps.join(', ')}` : '✅ Clean';
 
             const payload = {
                 embeds: [{
@@ -747,11 +782,14 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
                         { name: "📌 Topic", value: topic, inline: true },
                         { name: "\u200b", value: "\u200b" },
                         { name: "💬 Message", value: message },
-                        { name: "\u200b", value: "───── **Security Info** ─────" },
-                        { name: "🌐 IPv4 Address", value: `\`${ipv4}\``, inline: true },
-                        { name: "🌐 IPv6 Address", value: `\`${ipv6}\``, inline: true },
+                        { name: "\u200b", value: "───── **Security & Geolocation** ─────" },
+                        { name: "🌐 IP Address", value: `\`${ipv4}\``, inline: true },
                         { name: "📍 Location", value: locationStr, inline: true },
                         { name: "🏢 ISP", value: isp, inline: true },
+                        { name: "🛡️ VPN / Proxy", value: vpnStr, inline: true },
+                        { name: "🕵️ WebRTC Leak", value: webrtcStr, inline: true },
+                        { name: "🕒 Timezone Match", value: tzWarning, inline: true },
+                        { name: "\u200b", value: "───── **Device Fingerprint** ─────" },
                         { name: "💻 OS / Browser", value: `${device.os} · ${device.browser}`, inline: true },
                         { name: "🖥️ Screen", value: `${device.screenRes} (${device.colorDepth})`, inline: true },
                         { name: "⚙️ Hardware", value: `CPU: ${device.cores} · RAM: ${device.memory}`, inline: true },
