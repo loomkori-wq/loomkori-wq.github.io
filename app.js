@@ -12,6 +12,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
 
     const bottomBar = document.getElementById('bottom-bar');
     let isLoaded = false;
+    let lanyardHeartbeat = null;
 
 
     // Unify entry binding: Ensure Web Audio API and audio playback start gracefully together
@@ -35,197 +36,226 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         });
     }
 
-    const modalData = {
-        aboutme: {
-            title: '<i class="fas fa-user-astronaut"></i> About Me',
-            content: `<p>Hello! I'm Loom. I'm a 16+ year-old programmer who is always looking to make new friends. I'm a calm and gentle person, I try to help my friends and loved ones as much as I can, often preferring to help others rather than asking for help myself. I'm always open to building things for my friends, frequently creating websites for those in need, mostly for free, just to keep improving! I value my friends deeply, and I hope we can be friends too. Please make yourself comfortable around me, as I'm patient, tolerant, and very forgiving. If you want to chat, the best way to reach me is by checking my Discord status above and sending me a message, or sending a message through here.</p>`
-        },
-        games: {
-            title: '<i class="fas fa-gamepad"></i> Game rotation',
-            content: `<ul>
-                <li>Die of Death</li>
-                <li>Jujutsu Shenanigans</li>
-                <li>Something evil will happen</li>
-                <li>Forsaken</li>
-                <li>Watch Dogs</li>
-            </ul>`
-        },
-        anime: {
-            title: '<i class="fas fa-dragon"></i> Anime',
-            content: `<ul>
-                <li>Jujutsu Kaisen</li>
-                <li>Beastars</li>
-                <li>Mob Psycho 100 (Thinking of watching)</li>
-            </ul>`
-        },
-        skills: {
-            title: '<i class="fas fa-terminal"></i> Skills',
-            content: `<ul>
-                <li>Basic &rarr; early Medium C knowledge</li>
-                <li>Basic &rarr; early Medium HTML knowledge</li>
-                <li>Basic JavaScript & CSS knowledge</li>
-            </ul>`
-        },
-        likings: {
-            title: '<i class="fas fa-star"></i> Likings',
-            content: `<ul>
-                <li>Gaming</li>
-                <li>Coding</li>
-                <li>Hanging out</li>
-                <li>Calling</li>
-                <li>Talking</li>
-                <li>Learning About New Things</li>
-            </ul>`
-        },
-        learning: {
-            title: '<i class="fas fa-book-open"></i> Currently learning',
-            content: `<ul>
-                <li>Networking</li>
-                <li>C</li>
-                <li>JavaScript</li>
-                <li>CSS</li>
-                <li>HTML</li>
-            </ul>`
-        },
-        communities: {
-            title: '<i class="fas fa-users"></i> Communities',
-            content: `<ul>
-                <li>Cult of the Lamb</li>
-                <li>JJK (Jujutsu Kaisen)</li>
-                <li>Murder Drones</li>
-                <li>Die of Death (Roblox)</li>
-                <li>Deltarune</li>
-                <li>The Battle Bricks (Roblox)</li>
-                <li>TF2</li>
-                <li>Pseudoregalia</li>
-                <li>Hotline Miami</li>
-                <li>Watch Dogs</li>
-                <li>Payday</li>
-                <li>Resident Evil</li>
-                <li>Madness Combat</li>
-            </ul>`
-        },
-        // ── CUSTOM LAYOUTS (experimental) ──
-        // To revert: uncomment the original <ul>/<li> blocks below each entry and remove the custom content.
-
-        comforts: {
-            title: '<i class="fas fa-cloud-moon"></i> Comforts & Vibe',
-            content: `<div class="icon-grid">
-                <div class="grid-card"><i class="fas fa-moon"></i><span>Hanging out with friends at night</span></div>
-                <div class="grid-card"><i class="fas fa-microchip"></i><span>Helping my friends (especially about tech)</span></div>
-                <div class="grid-card"><i class="fas fa-cloud-rain"></i><span>Rainy nights</span></div>
-                <div class="grid-card"><i class="fas fa-lightbulb"></i><span>Sharing interests</span></div>
-                <div class="grid-card"><i class="fas fa-gamepad"></i><span>Gaming in a group</span></div>
-                <div class="grid-card"><i class="fas fa-bug-slash"></i><span>The feeling of finally fixing a bug after hours of trying</span></div>
-                <div class="grid-card"><i class="fas fa-headphones"></i><span>Cozy, quiet voice calls where everyone is just doing their own thing</span></div>
-            </div>`
-            /* ORIGINAL (revert target):
-            content: `<ul>
-                <li>Hanging out with friends at night</li>
-                <li>Helping my friends (especially about tech)</li>
-                <li>Rainy nights</li>
-                <li>Sharing interests</li>
-                <li>Gaming in a group</li>
-                <li>The feeling of finally fixing a bug after hours of trying</li>
-                <li>Cozy, quiet voice calls where everyone is just doing their own thing</li>
-            </ul>`
-            */
-        },
-        funfacts: {
-            title: '<i class="fas fa-wand-magic-sparkles"></i> Fun Facts',
-            content: `<div class="tag-cloud">
-                <span class="glass-tag">I'm Pansexual</span>
-                <span class="glass-tag">I love Strawberries and Strawberry-related stuff</span>
-                <span class="glass-tag">I'm very unserious</span>
-                <span class="glass-tag">I'm a huge listener</span>
-                <span class="glass-tag">It's hard for me to make decisions</span>
-                <span class="glass-tag">My most played game of all time is Rainbow Six Siege</span>
-            </div>`
-            /* ORIGINAL (revert target):
-            content: `<ul>
-                <li>I'm Pansexual</li>
-                <li>I love Strawberries and Strawberry-related stuff</li>
-                <li>I'm very unserious</li>
-                <li>I'm a huge listener</li>
-                <li>It's hard for me to make decisions</li>
-                <li>My most played game of all time is Rainbow Six Siege</li>
-            </ul>`
-            */
-        },
-        goals: {
-            title: '<i class="fas fa-rocket"></i> Future Goals',
-            content: `<div class="timeline-container">
-                <div class="timeline-node">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-label">Right now</div>
-                    <div class="timeline-text">Developing small programs</div>
-                </div>
-                <div class="timeline-node">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-label">Soon</div>
-                    <div class="timeline-text">Developing big projects</div>
-                </div>
-                <div class="timeline-node">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-label">Dream Goal</div>
-                    <div class="timeline-text">Being a software Engineer/Developer or Working at a hardware store</div>
-                </div>
-            </div>`
-            /* ORIGINAL (revert target):
-            content: `<ul>
-                <li>I want to be a Software Engineer/Developer</li>
-                <li>Work at or own my own Hardware Store!</li>
-                <li>Create a piece of software that genuinely helps make someone's day easier</li>
-            </ul>`
-            */
-        },
-        talktome: {
-            title: '<i class="fas fa-comment-dots"></i> How to talk to me',
-            content: `<div class="chat-layout">
-                <div class="chat-bubble">I usually reply fast on Discord when not busy</div>
-                <div class="chat-bubble">Don't be afraid to double-text me if I forget to reply</div>
-                <div class="chat-bubble">I love talking about games</div>
-                <div class="chat-bubble">I'm okay with random vents or rants (I'm a big listener!)</div>
-                <div class="chat-bubble">I struggle to text first sometimes</div>
-                <div class="chat-bubble">Feel free to just send me a random meme or video to start a conversation, that's one of the best ways!</div>
-                <div class="chat-bubble">If my Discord status is 'Idle' or 'DND', you can still message me. I'll read it as soon as I'm back</div>
-                <div class="chat-bubble">I might ask a lot of questions about your interests, mostly because I just love learning about what people are passionate about, but I also like to talk about my interests</div>
-            </div>`
-            /* ORIGINAL (revert target):
-            content: `<ul>
-                <li>I usually reply fast on Discord when not busy</li>
-                <li>Don't be afraid to double-text me if I forget to reply</li>
-                <li>I love talking about games or web design</li>
-                <li>I'm okay with random vents or rants (I'm a big listener!)</li>
-                <li>I struggle to text first sometimes</li>
-                <li>Feel free to just send me a random meme or video to start a conversation, that's one of the best ways!</li>
-                <li>If my Discord status is 'Idle' or 'DND', you can still message me. I'll read it as soon as I'm back</li>
-                <li>I might ask a lot of questions about your interests, mostly because I just love learning about what people are passionate about, but I also like to talk about my interests</li>
-            </ul>`
-            */
-        },
-        lover: {
-            title: '<i class="fas fa-heart"></i> My Lover',
-            content: `
-            <div class="profile-card lover-card" id="lover-card" style="margin: 10px auto; border: 1px solid var(--accent); outline: none; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: rgba(20,20,20,0.2);">
-                <div class="card-content" style="padding: 30px 20px;">
-                    <div class="avatar-container">
-                        <img src="https://ui-avatars.com/api/?name=S&background=random&size=150" alt="Profile Picture" class="avatar" id="lover-avatar" style="width: 100px; height: 100px;">
-                        <div class="status-dot" id="lover-status-dot" style="bottom: 5px; right: 5px; width: 16px; height: 16px;">
-                            <span class="status-tooltip" id="lover-status-tooltip">Offline</span>
-                        </div>
-                    </div>
-                    <h1 class="name" id="lover-name" style="font-size: 1.6rem;">shrieker.o7</h1>
-                    <p class="tagline" id="lover-tagline">@shrieker.o7</p>
-                </div>
-            </div>`
+    let currentLang = localStorage.getItem('preferredLang');
+    if (!currentLang) {
+        if (navigator.language && navigator.language.toLowerCase().startsWith('pt')) {
+            currentLang = 'PT';
+        } else {
+            currentLang = 'EN';
         }
-    };
+    }
+    
+    // Set initial active state
+    const langSwitcher = document.getElementById('lang-switcher');
+    if (langSwitcher) langSwitcher.setAttribute('data-active', currentLang);
+
+    // Initial language application
+    applyLanguage(currentLang);
+
+    // Language switcher event listeners
+    const langBtns = document.querySelectorAll('.lang-btn');
+    langBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const lang = btn.getAttribute('data-lang');
+            if (lang !== currentLang) {
+                currentLang = lang;
+                localStorage.setItem('preferredLang', lang);
+                if (langSwitcher) langSwitcher.setAttribute('data-active', lang);
+                applyLanguage(lang);
+            }
+        });
+    });
+
+    function applyLanguage(lang) {
+        if (typeof translations === 'undefined') return;
+        const dict = translations[lang];
+        if (!dict) return;
+
+        // Update html lang attribute for screen readers / SEO
+        document.documentElement.lang = lang === 'PT' ? 'pt-PT' : 'en';
+
+        // Update active button state
+        langBtns.forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+        });
+
+        // Update elements with data-i18n using a smooth fade transition
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) {
+                el.classList.add('fade-text');
+                setTimeout(() => {
+                    el.innerHTML = dict[key];
+                    el.classList.remove('fade-text');
+                }, 300); // Wait for CSS transition (0.3s)
+            }
+        });
+
+        // Update attributes
+        document.querySelectorAll('[data-i18n-title]').forEach(el => {
+            const key = el.getAttribute('data-i18n-title');
+            if (dict[key]) el.setAttribute('title', dict[key]);
+        });
+        document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+            const key = el.getAttribute('data-i18n-aria');
+            if (dict[key]) el.setAttribute('aria-label', dict[key]);
+        });
+    }
+
+    function getModalData() {
+        const t = (typeof translations !== 'undefined') ? translations[currentLang] : {};
+        // Fallback for missing translations (if script didn't load properly)
+        const getStr = (key) => t[key] || '';
+
+        return {
+            aboutme: {
+                title: `<i class="fas fa-user-astronaut"></i> ${getStr('modal_about_title')}`,
+                content: `<p>${getStr('modal_about_content')}</p>`
+            },
+            games: {
+                title: `<i class="fas fa-gamepad"></i> ${getStr('modal_games_title')}`,
+                content: `<ul>
+                    <li>Die of Death</li>
+                    <li>Jujutsu Shenanigans</li>
+                    <li>${getStr('game_evil')}</li>
+                    <li>Forsaken</li>
+                    <li>Watch Dogs</li>
+                </ul>`
+            },
+            anime: {
+                title: `<i class="fas fa-dragon"></i> ${getStr('modal_anime_title')}`,
+                content: `<ul>
+                    <li>${getStr('modal_anime_1')}</li>
+                    <li>${getStr('modal_anime_2')}</li>
+                    <li>${getStr('modal_anime_3')}</li>
+                </ul>`
+            },
+            skills: {
+                title: `<i class="fas fa-terminal"></i> ${getStr('modal_skills_title')}`,
+                content: `<ul>
+                    <li>${getStr('modal_skills_1')}</li>
+                    <li>${getStr('modal_skills_2')}</li>
+                    <li>${getStr('modal_skills_3')}</li>
+                </ul>`
+            },
+            likings: {
+                title: `<i class="fas fa-star"></i> ${getStr('modal_likings_title')}`,
+                content: `<ul>
+                    <li>${getStr('modal_likings_1')}</li>
+                    <li>${getStr('modal_likings_2')}</li>
+                    <li>${getStr('modal_likings_3')}</li>
+                    <li>${getStr('modal_likings_4')}</li>
+                    <li>${getStr('modal_likings_5')}</li>
+                    <li>${getStr('modal_likings_6')}</li>
+                </ul>`
+            },
+            learning: {
+                title: `<i class="fas fa-book-open"></i> ${getStr('modal_learning_title')}`,
+                content: `<ul>
+                    <li>${getStr('modal_learning_1')}</li>
+                    <li>C</li>
+                    <li>JavaScript</li>
+                    <li>CSS</li>
+                    <li>HTML</li>
+                </ul>`
+            },
+            communities: {
+                title: `<i class="fas fa-users"></i> ${getStr('modal_communities_title')}`,
+                content: `<ul>
+                    <li>Cult of the Lamb</li>
+                    <li>JJK (Jujutsu Kaisen)</li>
+                    <li>Murder Drones</li>
+                    <li>Die of Death (Roblox)</li>
+                    <li>Deltarune</li>
+                    <li>The Battle Bricks (Roblox)</li>
+                    <li>TF2</li>
+                    <li>Pseudoregalia</li>
+                    <li>Hotline Miami</li>
+                    <li>Watch Dogs</li>
+                    <li>Payday</li>
+                    <li>Resident Evil</li>
+                    <li>Madness Combat</li>
+                </ul>`
+            },
+            comforts: {
+                title: `<i class="fas fa-cloud-moon"></i> ${getStr('modal_comforts_title')}`,
+                content: `<div class="icon-grid">
+                    <div class="grid-card"><i class="fas fa-moon"></i><span>${getStr('modal_comforts_1')}</span></div>
+                    <div class="grid-card"><i class="fas fa-microchip"></i><span>${getStr('modal_comforts_2')}</span></div>
+                    <div class="grid-card"><i class="fas fa-cloud-rain"></i><span>${getStr('modal_comforts_3')}</span></div>
+                    <div class="grid-card"><i class="fas fa-lightbulb"></i><span>${getStr('modal_comforts_4')}</span></div>
+                    <div class="grid-card"><i class="fas fa-gamepad"></i><span>${getStr('modal_comforts_5')}</span></div>
+                    <div class="grid-card"><i class="fas fa-bug-slash"></i><span>${getStr('modal_comforts_6')}</span></div>
+                    <div class="grid-card"><i class="fas fa-headphones"></i><span>${getStr('modal_comforts_7')}</span></div>
+                </div>`
+            },
+            funfacts: {
+                title: `<i class="fas fa-wand-magic-sparkles"></i> ${getStr('modal_funfacts_title')}`,
+                content: `<div class="tag-cloud">
+                    <span class="glass-tag">${getStr('modal_funfacts_1')}</span>
+                    <span class="glass-tag">${getStr('modal_funfacts_2')}</span>
+                    <span class="glass-tag">${getStr('modal_funfacts_3')}</span>
+                    <span class="glass-tag">${getStr('modal_funfacts_4')}</span>
+                    <span class="glass-tag">${getStr('modal_funfacts_5')}</span>
+                    <span class="glass-tag">${getStr('modal_funfacts_6')}</span>
+                </div>`
+            },
+            goals: {
+                title: `<i class="fas fa-rocket"></i> ${getStr('modal_goals_title')}`,
+                content: `<div class="timeline-container">
+                    <div class="timeline-node">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-label">${getStr('modal_goals_lbl_1')}</div>
+                        <div class="timeline-text">${getStr('modal_goals_txt_1')}</div>
+                    </div>
+                    <div class="timeline-node">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-label">${getStr('modal_goals_lbl_2')}</div>
+                        <div class="timeline-text">${getStr('modal_goals_txt_2')}</div>
+                    </div>
+                    <div class="timeline-node">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-label">${getStr('modal_goals_lbl_3')}</div>
+                        <div class="timeline-text">${getStr('modal_goals_txt_3')}</div>
+                    </div>
+                </div>`
+            },
+            talktome: {
+                title: `<i class="fas fa-comment-dots"></i> ${getStr('modal_talk_title')}`,
+                content: `<div class="chat-layout">
+                    <div class="chat-bubble">${getStr('modal_talk_1')}</div>
+                    <div class="chat-bubble">${getStr('modal_talk_2')}</div>
+                    <div class="chat-bubble">${getStr('modal_talk_3')}</div>
+                    <div class="chat-bubble">${getStr('modal_talk_4')}</div>
+                    <div class="chat-bubble">${getStr('modal_talk_5')}</div>
+                    <div class="chat-bubble">${getStr('modal_talk_6')}</div>
+                    <div class="chat-bubble">${getStr('modal_talk_7')}</div>
+                    <div class="chat-bubble">${getStr('modal_talk_8')}</div>
+                </div>`
+            },
+            lover: {
+                title: `<i class="fas fa-heart"></i> ${getStr('modal_lover_title')}`,
+                content: `
+                <div class="profile-card lover-card" id="lover-card" style="margin: 10px auto; border: 1px solid var(--accent); outline: none; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: rgba(20,20,20,0.2);">
+                    <div class="card-content" style="padding: 30px 20px;">
+                        <div class="avatar-container">
+                            <img src="https://ui-avatars.com/api/?name=S&background=random&size=150" alt="Profile Picture" class="avatar" id="lover-avatar" style="width: 100px; height: 100px;">
+                            <div class="status-dot" id="lover-status-dot" style="bottom: 5px; right: 5px; width: 16px; height: 16px;">
+                                <span class="status-tooltip" id="lover-status-tooltip">${getStr('offline')}</span>
+                            </div>
+                        </div>
+                        <h1 class="name" id="lover-name" style="font-size: 1.6rem;">shrieker.o7</h1>
+                        <p class="tagline" id="lover-tagline">@shrieker.o7</p>
+                    </div>
+                </div>`
+            }
+        };
+    }
 
     document.querySelectorAll('.about-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const key = btn.getAttribute('data-modal');
-            const data = modalData[key];
+            const data = getModalData()[key];
             if (!data) return;
             modalTitle.innerHTML = data.title;
             modalBody.innerHTML = data.content;
@@ -357,7 +387,8 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             const message = JSON.parse(event.data);
 
             if (message.op === 1) {
-                setInterval(() => {
+                if (lanyardHeartbeat) clearInterval(lanyardHeartbeat);
+                lanyardHeartbeat = setInterval(() => {
                     if (ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ op: 3 }));
                     }
@@ -386,6 +417,10 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         };
 
         ws.onclose = () => {
+            if (lanyardHeartbeat) {
+                clearInterval(lanyardHeartbeat);
+                lanyardHeartbeat = null;
+            }
             setTimeout(connectLanyard, 5000);
         };
 
@@ -890,12 +925,12 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
 
                 msgOverlay.classList.remove('active');
                 msgForm.reset();
-                msgUserGrp.style.display = 'flex';
+                msgMethodGrp.style.display = 'flex';
+                msgDetailGrp.style.display = 'none';
+                msgMethodSelect.required = true;
+                msgDetailInput.required = false;
 
-                msgToast.classList.add('visible');
-                setTimeout(() => {
-                    msgToast.classList.remove('visible');
-                }, 3000);
+                showWarning("Failed to send message. Please try again.");
             });
     });
 

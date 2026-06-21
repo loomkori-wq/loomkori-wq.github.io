@@ -4,8 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loom | Profile</title>
-    <link rel="stylesheet" href="style.css?v=1.4">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Loom's personal profile. A 16+ year-old programmer always looking to make new friends.">
+    <meta name="author" content="Loom">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Loom | Profile">
+    <meta property="og:description" content="Loom's personal profile. A 16+ year-old programmer always looking to make new friends.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://loomkori-wq.github.io/">
+    <!-- Using UI Avatars as a fallback image for OG -->
+    <meta property="og:image" content="https://ui-avatars.com/api/?name=Loom&background=1a1a1a&color=e7d57b&size=512">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Loom | Profile">
+    <meta name="twitter:description" content="Loom's personal profile. A 16+ year-old programmer always looking to make new friends.">
+    <meta name="twitter:image" content="https://ui-avatars.com/api/?name=Loom&background=1a1a1a&color=e7d57b&size=512">
+
+    <!-- Security: Content Security Policy (Basic) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://ui-avatars.com https://cdn.discordapp.com; connect-src 'self' wss://api.lanyard.rest https://api.lanyard.rest https://api.ipapi.is stun:stun.l.google.com:19302 https://discord.com; frame-src 'none'; media-src 'self';">
+
+    <title data-i18n="title">Loom | Profile</title>
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <link rel="stylesheet" href="style.css?v=1.5">
     <link
         href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap"
         rel="stylesheet">
@@ -17,7 +45,7 @@
 
     <div id="loading-screen">
         <div class="loader-ring"></div>
-        <p class="loader-text">Establishing connection<span class="loader-dots">...</span></p>
+        <p class="loader-text"><span data-i18n="loader">Establishing connection</span><span class="loader-dots">...</span></p>
     </div>
 
     <div id="main-layout" class="hidden">
@@ -29,50 +57,25 @@
             <source src="assets/takeaslice.mp3" type="audio/mpeg">
         </audio>
 
-        <button id="mute-btn" class="mute-btn" title="Toggle Music">
+        <button id="mute-btn" class="mute-btn" title="Toggle Music" data-i18n-title="mute">
             <i class="fas fa-volume-up"></i>
         </button>
 
+        <div class="lang-switcher" id="lang-switcher">
+            <div class="lang-indicator" id="lang-indicator"></div>
+            <button class="lang-btn active" data-lang="EN">EN</button>
+            <button class="lang-btn" data-lang="PT">PT</button>
+        </div>
+
 
         <main class="profile-card">
-            <!-- Decorative Ribbons -->
-            <div class="ribbon-decorations" aria-hidden="true">
-                <!-- Top Ribbon -->
-                <svg class="vintage-ribbon ribbon-top" viewBox="0 0 500 150" preserveAspectRatio="none">
-                    <path d="M 30,70 L 100,70 L 100,110 L 65,95 L 30,110 Z" fill="#cfa878" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 100,70 L 120,50 L 120,110 L 100,110 Z" fill="#8f6b40" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 470,70 L 400,70 L 400,110 L 435,95 L 470,110 Z" fill="#cfa878" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 400,70 L 380,50 L 380,110 L 400,110 Z" fill="#8f6b40" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 120,50 Q 250,10 380,50 L 380,110 Q 250,70 120,110 Z" fill="#ebd2ae" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 130,58 Q 250,22 370,58" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="4 3"/>
-                    <path d="M 130,102 Q 250,66 370,102" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="4 3"/>
-                    <path d="M 38,76 L 94,76" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="3 2"/>
-                    <path d="M 38,104 L 94,104" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="3 2"/>
-                    <path d="M 462,76 L 406,76" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="3 2"/>
-                    <path d="M 462,104 L 406,104" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="3 2"/>
-                </svg>
-                <!-- Bottom Ribbon -->
-                <svg class="vintage-ribbon ribbon-bottom" viewBox="0 0 500 150" preserveAspectRatio="none">
-                    <path d="M 30,50 L 100,50 L 100,90 L 65,75 L 30,90 Z" fill="#cfa878" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 100,50 L 120,30 L 120,90 L 100,90 Z" fill="#8f6b40" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 470,50 L 400,50 L 400,90 L 435,75 L 470,90 Z" fill="#cfa878" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 400,50 L 380,30 L 380,90 L 400,90 Z" fill="#8f6b40" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 120,30 Q 250,70 380,30 L 380,90 Q 250,130 120,90 Z" fill="#ebd2ae" stroke="#5c4a32" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M 130,38 Q 250,74 370,38" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="4 3"/>
-                    <path d="M 130,82 Q 250,118 370,82" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="4 3"/>
-                    <path d="M 38,56 L 94,56" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="3 2"/>
-                    <path d="M 38,84 L 94,84" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="3 2"/>
-                    <path d="M 462,56 L 406,56" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="3 2"/>
-                    <path d="M 462,84 L 406,84" fill="none" stroke="#5c4a32" stroke-width="1.5" stroke-dasharray="3 2"/>
-                </svg>
-            </div>
 
             <div class="card-content">
                 <div class="avatar-container">
                     <img src="https://ui-avatars.com/api/?name=F&background=random&size=150" alt="Profile Picture"
                         class="avatar">
                     <div class="status-dot">
-                        <span class="status-tooltip" id="status-tooltip">Offline</span>
+                        <span class="status-tooltip" id="status-tooltip" data-i18n="offline">Offline</span>
                     </div>
                 </div>
 
@@ -80,80 +83,80 @@
                 <p class="tagline">@faustino</p>
 
                 <div class="social-links">
-                    <a href="https://www.roblox.com/users/3561671159/profile" target="_blank" class="social-icon"
+                    <a href="https://www.roblox.com/users/3561671159/profile" target="_blank" rel="noopener noreferrer" class="social-icon"
                         aria-label="Roblox"><svg class="roblox-svg" viewBox="0 0 512 512" fill="currentColor" width="20"
                             height="20">
                             <path
                                 d="M124.539 0L0 387.47 387.461 512 512 124.53 124.539 0zM283.395 340.267l-112.676-29.958 29.958-112.676 112.676 29.958-29.958 112.676z" />
                         </svg></a>
-                    <a href="https://www.instagram.com/garbielp.p" target="_blank" class="social-icon"
+                    <a href="https://www.instagram.com/garbielp.p" target="_blank" rel="noopener noreferrer" class="social-icon"
                         aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://mail.google.com/mail/?view=cm&to=loomkori@gmail.com" target="_blank"
+                    <a href="https://mail.google.com/mail/?view=cm&to=loomkori@gmail.com" target="_blank" rel="noopener noreferrer"
                         class="social-icon email-icon" aria-label="Gmail">
                         <i class="fas fa-envelope"></i>
                         <span class="email-tooltip">loomkori@gmail.com</span>
                     </a>
-                    <a href="https://discord.com/users/833078738022563940" target="_blank" class="social-icon"
+                    <a href="https://discord.com/users/833078738022563940" target="_blank" rel="noopener noreferrer" class="social-icon"
                         aria-label="Discord"><i class="fab fa-discord"></i></a>
                 </div>
             </div>
 
             <div class="bottom-bar" id="bottom-bar">
                 <div class="bar-header">
-                    <span class="bar-title">more about me...</span>
+                    <span class="bar-title" data-i18n="bar_title">more about me...</span>
                     <i class="fas fa-chevron-down toggle-icon"></i>
                 </div>
                 <div class="bar-details">
                     <div class="main-action-wrapper">
                         <button class="about-btn primary-main-btn" data-modal="aboutme">
                             <i class="fas fa-user-astronaut"></i>
-                            <span>About Me</span>
+                            <span data-i18n="btn_about">About Me</span>
                         </button>
                     </div>
                     <div class="about-scroll-row">
                         <button class="about-btn" data-modal="games">
                             <i class="fas fa-gamepad"></i>
-                            <span>Games</span>
+                            <span data-i18n="btn_games">Games</span>
                         </button>
                         <button class="about-btn" data-modal="anime">
                             <i class="fas fa-dragon"></i>
-                            <span>Anime</span>
+                            <span data-i18n="btn_anime">Anime</span>
                         </button>
                         <button class="about-btn" data-modal="communities">
                             <i class="fas fa-users"></i>
-                            <span>Communities</span>
+                            <span data-i18n="btn_communities">Communities</span>
                         </button>
                         <button class="about-btn" data-modal="skills">
                             <i class="fas fa-terminal"></i>
-                            <span>Skills</span>
+                            <span data-i18n="btn_skills">Skills</span>
                         </button>
                         <button class="about-btn" data-modal="likings">
                             <i class="fas fa-star"></i>
-                            <span>Likings</span>
+                            <span data-i18n="btn_likings">Likings</span>
                         </button>
                         <button class="about-btn" data-modal="learning">
                             <i class="fas fa-book-open"></i>
-                            <span>Learning</span>
+                            <span data-i18n="btn_learning">Learning</span>
                         </button>
                         <button class="about-btn" data-modal="comforts">
                             <i class="fas fa-cloud-moon"></i>
-                            <span>Comforts</span>
+                            <span data-i18n="btn_comforts">Comforts</span>
                         </button>
                         <button class="about-btn" data-modal="funfacts">
                             <i class="fas fa-wand-magic-sparkles"></i>
-                            <span>Fun Facts</span>
+                            <span data-i18n="btn_funfacts">Fun Facts</span>
                         </button>
                         <button class="about-btn" data-modal="goals">
                             <i class="fas fa-rocket"></i>
-                            <span>Goals</span>
+                            <span data-i18n="btn_goals">Goals</span>
                         </button>
                         <button class="about-btn" data-modal="talktome">
                             <i class="fas fa-comment-dots"></i>
-                            <span>Talk to Me</span>
+                            <span data-i18n="btn_talk">Talk to Me</span>
                         </button>
                         <button class="about-btn lover-btn" data-modal="lover">
                             <i class="fas fa-heart"></i>
-                            <span>Lover</span>
+                            <span data-i18n="btn_lover">Lover</span>
                         </button>
                     </div>
                 </div>
@@ -170,12 +173,12 @@
     </div>
 
     <!-- ── Messaging System ── -->
-    <button class="fab-msg" id="fab-msg" aria-label="Send Message"><i class="fas fa-envelope"></i></button>
+    <button class="fab-msg" id="fab-msg" aria-label="Send Message" data-i18n-aria="msg_title"><i class="fas fa-envelope"></i></button>
 
     <div class="msg-overlay" id="msg-overlay">
         <div class="msg-card">
             <div class="msg-header">
-                <h3><i class="fas fa-paper-plane"></i> Send a Message</h3>
+                <h3><i class="fas fa-paper-plane"></i> <span data-i18n="msg_title">Send a Message</span></h3>
             </div>
             <form id="msg-form">
                 <!-- Honeypot: hidden from humans, bots fill it in -->
@@ -184,68 +187,73 @@
                     <input type="text" id="msg-website" name="website" tabindex="-1" autocomplete="off">
                 </div>
                 <div class="msg-field-group" id="msg-method-grp">
-                    <label for="msg-contact-method">Reply-To Method</label>
+                    <label for="msg-contact-method" data-i18n="msg_method">Reply-To Method</label>
                     <select id="msg-contact-method" required>
-                        <option value="" disabled selected>Select a contact method...</option>
-                        <option value="name">Just a Name (no reply needed)</option>
-                        <option value="discord">Discord</option>
-                        <option value="email">Email Address</option>
-                        <option value="phone">Phone Number</option>
-                        <option value="roblox">Roblox Username</option>
+                        <option value="" disabled selected data-i18n="msg_method_placeholder">Select a contact method...</option>
+                        <option value="name" data-i18n="msg_method_anon">Just a Name (no reply needed)</option>
+                        <option value="discord" data-i18n="msg_method_discord">Discord</option>
+                        <option value="email" data-i18n="msg_method_email">Email Address</option>
+                        <option value="phone" data-i18n="msg_method_phone">Phone Number</option>
+                        <option value="roblox" data-i18n="msg_method_roblox">Roblox Username</option>
                     </select>
                 </div>
                 <div class="msg-field-group" id="msg-detail-grp" style="display: none;">
-                    <label for="msg-contact-detail" id="msg-detail-label">Username / Address</label>
+                    <label for="msg-contact-detail" id="msg-detail-label" data-i18n="msg_detail">Username / Address</label>
                     <input type="text" id="msg-contact-detail" autocomplete="off">
                 </div>
                 <div class="msg-anon-row">
                     <input type="checkbox" id="msg-anon">
-                    <label for="msg-anon"><i class="fas fa-user-secret"></i> Send Anonymously</label>
+                    <label for="msg-anon"><i class="fas fa-user-secret"></i> <span data-i18n="msg_anon">Send Anonymously</span></label>
                 </div>
                 <div class="msg-field-group">
-                    <label for="msg-topic">Topic</label>
+                    <label for="msg-topic" data-i18n="msg_topic">Topic</label>
                     <input type="text" id="msg-topic" required autocomplete="off">
                 </div>
                 <div class="msg-field-group">
-                    <label for="msg-message">Message</label>
+                    <label for="msg-message" data-i18n="msg_message">Message</label>
                     <textarea id="msg-message" rows="4" required></textarea>
                 </div>
-                <p class="msg-privacy-notice"><i class="fas fa-shield-halved"></i> For security, basic device info is logged with your message.</p>
                 <div class="msg-actions">
                     <button type="button" class="msg-btn msg-btn-back" id="msg-back"><i class="fas fa-arrow-left"></i>
-                        Back</button>
-                    <button type="submit" class="msg-btn msg-btn-send" id="msg-send-btn"><i class="fas fa-paper-plane"></i> <span id="msg-send-text">Send</span></button>
+                        <span data-i18n="msg_back">Back</span></button>
+                    <button type="submit" class="msg-btn msg-btn-send" id="msg-send-btn"><i
+                            class="fas fa-paper-plane"></i> <span id="msg-send-text" data-i18n="msg_send">Send</span></button>
                 </div>
             </form>
         </div>
     </div>
 
     <div class="msg-toast" id="msg-toast">
-        <i class="fas fa-check-circle"></i> Message sent!
+        <i class="fas fa-check-circle"></i> <span data-i18n="toast_sent">Message sent!</span>
     </div>
 
     <div class="msg-toast msg-toast-warn" id="msg-toast-warn">
-        <i class="fas fa-clock"></i> <span id="msg-warn-text">Please wait before sending another message.</span>
+        <i class="fas fa-clock"></i> <span id="msg-warn-text" data-i18n="toast_warn">Please wait before sending another message.</span>
     </div>
 
     <div class="custom-cursor">
         <svg viewBox="0 0 100 100" class="solver-svg" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="50,30 67.32,40 67.32,60 50,70 32.68,60 32.68,40" fill="none" class="solver-hex" stroke="currentColor" stroke-width="6" stroke-linejoin="round"/>
+            <polygon points="50,30 67.32,40 67.32,60 50,70 32.68,60 32.68,40" fill="none" class="solver-hex"
+                stroke="currentColor" stroke-width="6" stroke-linejoin="round" />
             <g>
-                <line x1="50" y1="30" x2="50" y2="10" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                <polygon points="50,0 62,15 50,20 38,15" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <line x1="50" y1="30" x2="50" y2="10" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                <polygon points="50,0 62,15 50,20 38,15" fill="currentColor" stroke="currentColor" stroke-width="2"
+                    stroke-linejoin="round" />
             </g>
             <g transform="rotate(120 50 50)">
-                <line x1="50" y1="30" x2="50" y2="10" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                <polygon points="50,0 62,15 50,20 38,15" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <line x1="50" y1="30" x2="50" y2="10" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                <polygon points="50,0 62,15 50,20 38,15" fill="currentColor" stroke="currentColor" stroke-width="2"
+                    stroke-linejoin="round" />
             </g>
             <g transform="rotate(240 50 50)">
-                <line x1="50" y1="30" x2="50" y2="10" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-                <polygon points="50,0 62,15 50,20 38,15" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <line x1="50" y1="30" x2="50" y2="10" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                <polygon points="50,0 62,15 50,20 38,15" fill="currentColor" stroke="currentColor" stroke-width="2"
+                    stroke-linejoin="round" />
             </g>
         </svg>
     </div>
-    <script src="app.js?v=1.4"></script>
+    <script src="translations.js?v=1.6"></script>
+    <script src="app.js?v=1.6"></script>
 </body>
 
 </html>
