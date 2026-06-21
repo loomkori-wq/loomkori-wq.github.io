@@ -49,10 +49,8 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
     const langSwitcher = document.getElementById('lang-switcher');
     if (langSwitcher) langSwitcher.setAttribute('data-active', currentLang);
 
-    // Initial language application
-    applyLanguage(currentLang);
-
-    // Language switcher event listeners
+    // Language switcher buttons must be grabbed BEFORE the first applyLanguage()
+    // call below, since applyLanguage() reads langBtns internally.
     const langBtns = document.querySelectorAll('.lang-btn');
     langBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -65,6 +63,9 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             }
         });
     });
+
+    // Initial language application
+    applyLanguage(currentLang);
 
     function applyLanguage(lang) {
         if (typeof translations === 'undefined') return;
