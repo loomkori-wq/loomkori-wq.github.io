@@ -520,7 +520,11 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
     const msgBack = document.getElementById('msg-back');
     const msgForm = document.getElementById('msg-form');
     const msgAnon = document.getElementById('msg-anon');
-    const msgUserGrp = document.getElementById('msg-user-grp');
+    const msgMethodGrp = document.getElementById('msg-method-grp');
+    const msgMethodSelect = document.getElementById('msg-contact-method');
+    const msgDetailGrp = document.getElementById('msg-detail-grp');
+    const msgDetailInput = document.getElementById('msg-contact-detail');
+    const msgDetailLabel = document.getElementById('msg-detail-label');
     const msgToast = document.getElementById('msg-toast');
     const msgToastWarn = document.getElementById('msg-toast-warn');
     const msgWarnText = document.getElementById('msg-warn-text');
@@ -611,14 +615,52 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
     msgBack.addEventListener('click', () => {
         msgOverlay.classList.remove('active');
         msgForm.reset();
-        msgUserGrp.style.display = 'flex';
+        msgMethodGrp.style.display = 'flex';
+        msgDetailGrp.style.display = 'none';
+        msgMethodSelect.required = true;
+        msgDetailInput.required = false;
+    });
+
+    msgMethodSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        msgDetailGrp.style.display = 'flex';
+        msgDetailInput.required = true;
+        msgDetailInput.value = '';
+
+        if (val === 'discord') {
+            msgDetailLabel.innerText = 'Discord Username';
+            msgDetailInput.type = 'text';
+            msgDetailInput.placeholder = 'e.g. username';
+            msgDetailInput.pattern = "^.{2,32}$"; 
+        } else if (val === 'email') {
+            msgDetailLabel.innerText = 'Email Address';
+            msgDetailInput.type = 'email';
+            msgDetailInput.placeholder = 'e.g. name@example.com';
+            msgDetailInput.removeAttribute('pattern');
+        } else if (val === 'phone') {
+            msgDetailLabel.innerText = 'Phone Number';
+            msgDetailInput.type = 'tel';
+            msgDetailInput.placeholder = 'e.g. +1 234 567 8900';
+            msgDetailInput.pattern = "^\\+?[0-9\\s\\-\\(\\)]{7,20}$";
+        } else if (val === 'roblox') {
+            msgDetailLabel.innerText = 'Roblox Username';
+            msgDetailInput.type = 'text';
+            msgDetailInput.placeholder = 'e.g. RobloxPlayer123';
+            msgDetailInput.pattern = "^[a-zA-Z0-9_]{3,20}$";
+        }
     });
 
     msgAnon.addEventListener('change', (e) => {
         if (e.target.checked) {
-            msgUserGrp.style.display = 'none';
+            msgMethodGrp.style.display = 'none';
+            msgDetailGrp.style.display = 'none';
+            msgMethodSelect.required = false;
+            msgDetailInput.required = false;
         } else {
-            msgUserGrp.style.display = 'flex';
+            msgMethodGrp.style.display = 'flex';
+            if (msgMethodSelect.value) msgDetailGrp.style.display = 'flex';
+            msgMethodSelect.required = true;
+            msgDetailInput.required = msgMethodSelect.value !== '';
         }
     });
 
@@ -676,7 +718,10 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             // Bot detected — silently pretend it worked
             msgOverlay.classList.remove('active');
             msgForm.reset();
-            msgUserGrp.style.display = 'flex';
+            msgMethodGrp.style.display = 'flex';
+            msgDetailGrp.style.display = 'none';
+            msgMethodSelect.required = true;
+            msgDetailInput.required = false;
             msgToast.classList.add('visible');
             setTimeout(() => msgToast.classList.remove('visible'), 3000);
             return;
@@ -697,7 +742,9 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         }
 
         const isAnon = msgAnon.checked;
-        const user = isAnon ? "Anonymous" : (document.getElementById('msg-user').value || "Anonymous");
+        const method = msgMethodSelect.value;
+        const detail = msgDetailInput.value.trim();
+        const user = isAnon ? "Anonymous" : (method ? `${method.toUpperCase()}: ${detail}` : "Anonymous");
         const topic = document.getElementById('msg-topic').value.trim();
         const message = document.getElementById('msg-message').value.trim();
 
@@ -818,7 +865,10 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
 
                 msgOverlay.classList.remove('active');
                 msgForm.reset();
-                msgUserGrp.style.display = 'flex';
+                msgMethodGrp.style.display = 'flex';
+                msgDetailGrp.style.display = 'none';
+                msgMethodSelect.required = true;
+                msgDetailInput.required = false;
 
                 msgToast.classList.add('visible');
                 setTimeout(() => {

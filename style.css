@@ -1209,6 +1209,45 @@ a, button {
     transform: scale(1.1);
 }
 
+/* ── Vine Decorations ── */
+.vine-decorations {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: visible;
+}
+
+.vine-left {
+    position: absolute;
+    left: -25px;
+    top: 10%;
+    height: 60%;
+    width: 30px;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+}
+
+.vine-right {
+    position: absolute;
+    right: -25px;
+    top: 10%;
+    height: 60%;
+    width: 30px;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+}
+
+.vine-bottom {
+    position: absolute;
+    bottom: 40px;
+    left: 10%;
+    width: 80%;
+    height: 30px;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+}
+
 .msg-toast {
     position: fixed;
     top: -80px;
