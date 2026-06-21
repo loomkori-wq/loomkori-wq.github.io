@@ -343,7 +343,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
 
         ws.onopen = () => {
             const ids = [DISCORD_USER_ID];
-            if (LOVER_DISCORD_ID && LOVER_DISCORD_ID !== '819677851178500136') {
+            if (LOVER_DISCORD_ID) {
                 ids.push(LOVER_DISCORD_ID);
             }
 
