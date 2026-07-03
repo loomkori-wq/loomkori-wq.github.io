@@ -40,6 +40,8 @@ button {
 /* ── Custom Cursor ── */
 .custom-cursor {
     position: fixed;
+    top: -100px;
+    left: -100px;
     width: 32px;
     height: 32px;
     pointer-events: none;
@@ -156,6 +158,7 @@ button {
     position: relative;
     width: 100%;
     height: 100vh;
+    height: 100dvh; /* Better for mobile browsers */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1790,4 +1793,89 @@ button {
 /* Fade class for smooth language transitions */
 .fade-text {
     opacity: 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE & TOUCH DEVICE RESPONSIVENESS
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .profile-card {
+        width: 95%;
+        max-width: 100%;
+        margin-bottom: 60px; /* Leave space for bottom buttons */
+    }
+
+    .card-content {
+        padding: 30px 20px;
+    }
+
+    .avatar {
+        width: 100px;
+        height: 100px;
+    }
+
+    .name {
+        font-size: 1.7rem;
+    }
+
+    .fab-msg {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+    }
+
+    .mute-btn {
+        bottom: 20px;
+        left: 20px;
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .lang-switcher {
+        top: 20px;
+        right: 20px;
+    }
+
+    .modal-card {
+        padding: 24px 20px;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .modal-body {
+        max-height: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .social-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+    
+    .about-btn {
+        padding: 6px 12px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Touch device optimizations: disable custom cursor and restore default pointers */
+@media (hover: none) and (pointer: coarse) {
+    body, a, button, .lang-btn, .msg-btn, .msg-anon-row label, .msg-field-group input, .msg-field-group textarea, .msg-field-group select, .fab-msg {
+        cursor: auto !important;
+    }
+
+    .custom-cursor {
+        display: none !important;
+    }
+    
+    /* Remove hover dependencies for touch devices where elements remain stuck in hover state */
+    .social-icon:active, .about-btn:active, .primary-main-btn:active, .grid-card:active {
+        transform: scale(0.95);
+    }
 }
