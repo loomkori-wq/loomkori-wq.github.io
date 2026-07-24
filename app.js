@@ -637,11 +637,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
                 if (foundActivity) {
                     activityDisplay.innerHTML = outputHTML;
                 }
-<br>
-                        <span class="activity-artist">${playing.details || playing.state || ''}</span>
-                    `;
-                    foundActivity = true;
-                }
+
             }
             if (!foundActivity) {
                 activityDisplay.innerHTML = `<i class="fas fa-satellite-dish"></i> STATUS: IDLE<br><span class="activity-artist">No active processes detected.</span>`;
