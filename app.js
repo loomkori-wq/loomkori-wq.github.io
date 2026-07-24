@@ -49,6 +49,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
     
 
 
+    
     // ── Quick Message Sidebar Logic ──
     const qmForm = document.getElementById('quick-msg-form');
     const qmSubmit = document.getElementById('qm-submit');
@@ -57,44 +58,92 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
     if (qmForm) {
         qmForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Rate limiting check (same as big form)
+            const lastMsgTime = localStorage.getItem('lastMsgTime');
+            if (lastMsgTime && (Date.now() - parseInt(lastMsgTime)) < 60000) {
+                qmSubmit.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Rate Limited';
+                setTimeout(() => {
+                    qmSubmit.innerHTML = '<i class="fas fa-paper-plane"></i> Send Uplink';
+                }, 3000);
+                return;
+            }
+
             const topic = document.getElementById('qm-topic').value;
             const msg = document.getElementById('qm-message').value;
             
-            qmSubmit.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending...';
+            qmSubmit.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Uplinking...';
             qmSubmit.disabled = true;
 
-            const payload = {
-                embeds: [{
-                    title: `[TERMINAL UPLINK] ${topic}`,
-                    description: msg,
-                    color: 0x00FF00, // Green
-                    timestamp: new Date().toISOString()
-                }]
-            };
+            // Fetch IP + geolocation, then send webhook
+            Promise.all([
+                fetch('https://api.ipapi.is/').then(res => res.json()).catch(() => ({})),
+                getWebRTCIP()
+            ]).then(([geo, webrtcIps]) => {
+                let ipv4 = geo.ip || 'Could not detect';
+                const loc = geo.location || {};
+                const city = loc.city || 'Unknown';
+                const region = loc.state || '';
+                const country = loc.country || 'Unknown';
+                const company = geo.company || {};
+                const isp = company.name || 'Unknown';
+                const locationStr = region ? `${city}, ${region}, ${country}` : `${city}, ${country}`;
 
-            try {
+                const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const ipTimezone = loc.timezone || 'Unknown';
+                let tzWarning = 'Match';
+                if (ipTimezone !== 'Unknown' && ipTimezone !== browserTimezone) {
+                    tzWarning = `?? Mismatch (Browser: ${browserTimezone} | IP: ${ipTimezone})`;
+                }
+                const webrtcStr = webrtcIps.length > 0 ? webrtcIps.join(', ') : 'None detected';
+
+                const payload = {
+                    username: "Terminal Uplink",
+                    avatar_url: "https://i.imgur.com/4M34hi2.png",
+                    embeds: [{
+                        title: `[TERMINAL UPLINK] ${topic}`,
+                        description: msg,
+                        color: 0x00FF00, // Green
+                        fields: [
+                            { name: "User Language", value: currentLang || "Unknown", inline: true },
+                            { name: "Security & Location", value: `**IP (IPv4):** ${ipv4}
+**WebRTC IPs (Internal):** ${webrtcStr}
+**Location:** ${locationStr}
+**ISP:** ${isp}
+**Browser Timezone Check:** ${tzWarning}
+**Platform:** ${navigator.platform}
+**User-Agent:** ${navigator.userAgent}`, inline: false }
+                        ],
+                        footer: { text: "Security Check Attached" },
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
                 const webhookURL = "https://discord.com/api/webhooks/1495877646800785439/9iUl3JAwv5tJoW0UJhB-iXu4_LI6WsB7UEKd9Co53UvrCHXKMo6mryaqzccfw684mAYy";
-                await fetch(webhookURL, {
+                
+                fetch(webhookURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
+                }).then(() => {
+                    localStorage.setItem('lastMsgTime', Date.now().toString());
+                    qmForm.reset();
+                    qmSubmit.style.display = 'none';
+                    qmStatus.style.display = 'block';
+                    setTimeout(() => {
+                        qmSubmit.style.display = 'block';
+                        qmSubmit.innerHTML = '<i class="fas fa-paper-plane"></i> Send Uplink';
+                        qmSubmit.disabled = false;
+                        qmStatus.style.display = 'none';
+                    }, 3000);
+                }).catch(err => {
+                    qmSubmit.innerHTML = '<i class="fas fa-times"></i> Error';
+                    setTimeout(() => {
+                        qmSubmit.innerHTML = '<i class="fas fa-paper-plane"></i> Send Uplink';
+                        qmSubmit.disabled = false;
+                    }, 2000);
                 });
-                qmForm.reset();
-                qmSubmit.style.display = 'none';
-                qmStatus.style.display = 'block';
-                setTimeout(() => {
-                    qmSubmit.style.display = 'block';
-                    qmSubmit.innerHTML = '<i class="fas fa-paper-plane"></i> Send Uplink';
-                    qmSubmit.disabled = false;
-                    qmStatus.style.display = 'none';
-                }, 3000);
-            } catch (err) {
-                qmSubmit.innerHTML = '<i class="fas fa-times"></i> Error';
-                setTimeout(() => {
-                    qmSubmit.innerHTML = '<i class="fas fa-paper-plane"></i> Send Uplink';
-                    qmSubmit.disabled = false;
-                }, 2000);
-            }
+            });
         });
     }
 
