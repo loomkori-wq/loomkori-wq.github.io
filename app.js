@@ -1030,7 +1030,8 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         const device = getDeviceInfo();
 
         // Helper: WebRTC Leak Detection
-        const getWebRTCIP = () => new Promise(resolve => {
+        function getWebRTCIP() {
+        return new Promise(resolve => {
             const ips = [];
             try {
                 const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
