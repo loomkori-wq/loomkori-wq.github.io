@@ -2013,9 +2013,9 @@ button {
     word-wrap: break-word;
 }
 
-.activity-display .spotify-title {
+.activity-display .soundcloud-title {
     font-weight: 700;
-    color: #1DB954; /* Spotify Green */
+    color: #ff5500; /* SoundCloud Orange */
     display: block;
     margin-bottom: 2px;
 }
@@ -2028,4 +2028,26 @@ button {
     .side-panel {
         display: none;
     }
+}
+
+/* Quick Message Input Styles */
+.qm-input {
+    background: rgba(10, 10, 10, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    padding: 10px;
+    font-family: var(--font-cmd);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.3s;
+    border-radius: 0;
+}
+.qm-input:focus {
+    border-color: var(--accent);
+}
+.qm-btn {
+    width: 100%;
+    padding: 10px !important;
+    font-size: 0.85rem !important;
+    text-transform: uppercase;
 }

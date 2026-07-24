@@ -48,6 +48,56 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
     // Set initial active state
     
 
+
+    // ── Quick Message Sidebar Logic ──
+    const qmForm = document.getElementById('quick-msg-form');
+    const qmSubmit = document.getElementById('qm-submit');
+    const qmStatus = document.getElementById('qm-status');
+
+    if (qmForm) {
+        qmForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const topic = document.getElementById('qm-topic').value;
+            const msg = document.getElementById('qm-message').value;
+            
+            qmSubmit.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending...';
+            qmSubmit.disabled = true;
+
+            const payload = {
+                embeds: [{
+                    title: `[TERMINAL UPLINK] ${topic}`,
+                    description: msg,
+                    color: 0x00FF00, // Green
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            try {
+                const webhookURL = "https://discord.com/api/webhooks/1495877646800785439/9iUl3JAwv5tJoW0UJhB-iXu4_LI6WsB7UEKd9Co53UvrCHXKMo6mryaqzccfw684mAYy";
+                await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                qmForm.reset();
+                qmSubmit.style.display = 'none';
+                qmStatus.style.display = 'block';
+                setTimeout(() => {
+                    qmSubmit.style.display = 'block';
+                    qmSubmit.innerHTML = '<i class="fas fa-paper-plane"></i> Send Uplink';
+                    qmSubmit.disabled = false;
+                    qmStatus.style.display = 'none';
+                }, 3000);
+            } catch (err) {
+                qmSubmit.innerHTML = '<i class="fas fa-times"></i> Error';
+                setTimeout(() => {
+                    qmSubmit.innerHTML = '<i class="fas fa-paper-plane"></i> Send Uplink';
+                    qmSubmit.disabled = false;
+                }, 2000);
+            }
+        });
+    }
+
     // ── Side Panel Logic ──
     const clockDisplay = document.getElementById('clock-display');
     const dateDisplay = document.getElementById('date-display');
@@ -554,21 +604,40 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
         if (activityDisplay && !isLover) {
             let foundActivity = false;
             if (data.activities && data.activities.length > 0) {
-                // Find spotify or playing
-                const spotify = data.activities.find(a => a.name === 'Spotify');
-                const playing = data.activities.find(a => a.type === 0); // Type 0 is PLAYING
                 
-                if (spotify) {
-                    activityDisplay.innerHTML = `
-                        <span class="spotify-title"><i class="fab fa-spotify"></i> LISTENING TO SPOTIFY</span>
-                        ${spotify.details}<br>
-                        <span class="activity-artist">by ${spotify.state}</span>
+                
+                // Find soundcloud or playing
+                const soundcloud = data.activities.find(a => a.name && a.name.toLowerCase() === 'soundcloud');
+                const playing = data.activities.find(a => a.type === 0 && (!a.name || a.name.toLowerCase() !== 'soundcloud'));
+                
+                let outputHTML = "";
+
+                if (soundcloud) {
+                    outputHTML += `
+                        <span class="soundcloud-title"><i class="fab fa-soundcloud"></i> LISTENING TO SOUNDCLOUD</span><br>
+                        ${soundcloud.details || 'Unknown Track'}<br>
+                        <span class="activity-artist">by ${soundcloud.state || 'Unknown Artist'}</span>
                     `;
                     foundActivity = true;
-                } else if (playing) {
-                    activityDisplay.innerHTML = `
+                } 
+                
+                if (playing) {
+                    // If we already have soundcloud, add a separator
+                    if (soundcloud) {
+                        outputHTML += `<div style="border-top: 1px dashed rgba(255,255,255,0.2); margin: 10px 0;"></div>`;
+                    }
+                    outputHTML += `
                         <span style="color: var(--accent); font-weight: 700;"><i class="fas fa-gamepad"></i> PLAYING</span><br>
                         ${playing.name}<br>
+                        <span class="activity-artist">${playing.details || playing.state || ''}</span>
+                    `;
+                    foundActivity = true;
+                }
+
+                if (foundActivity) {
+                    activityDisplay.innerHTML = outputHTML;
+                }
+<br>
                         <span class="activity-artist">${playing.details || playing.state || ''}</span>
                     `;
                     foundActivity = true;
