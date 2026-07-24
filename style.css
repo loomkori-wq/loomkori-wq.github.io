@@ -1,3 +1,14 @@
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes traceBorder {
+  to {
+    --angle: 360deg;
+  }
+}
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap');
 
 :root {
@@ -192,24 +203,34 @@ button {
     z-index: -1;
 }
 
-.profile-card {
-    background: rgba(20, 20, 20, 0.45);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--card-border);
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
-    border-radius: 0; clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+
+.profile-card-wrapper {
     width: 90%;
     max-width: 400px;
+    padding: 2px; /* This padding acts as the border width */
+    background: conic-gradient(from var(--angle), transparent 70%, var(--accent) 100%);
+    animation: traceBorder 4s linear infinite, cardEntrance 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    border-radius: 0;
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-card {
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 0;
+    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
-    /* Card entrance: slides up from below and fades in on page reveal */
-    animation: cardEntrance 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
 
 @keyframes cardEntrance {
     from {
@@ -244,20 +265,17 @@ button {
     border: 3px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 0 15px var(--glow);
     /* Gentle idle float — subtle, non-distracting */
+    animation: avatarGlow 5s ease-in-out infinite;
 }
 
 @keyframes avatarFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+}
 
-    0%,
-    100% {
-        transform: translateY(0);
-        box-shadow: 0 0 15px var(--glow), 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    50% {
-        transform: translateY(-7px);
-        box-shadow: 0 0 25px var(--glow), 0 18px 30px rgba(0, 0, 0, 0.4);
-    }
+@keyframes avatarGlow {
+    0%, 100% { box-shadow: 0 0 15px var(--glow), 0 8px 20px rgba(0, 0, 0, 0.3); }
+    50% { box-shadow: 0 0 25px var(--glow), 0 18px 30px rgba(0, 0, 0, 0.4); }
 }
 
 .status-dot {
@@ -1879,5 +1897,135 @@ button {
     /* Remove hover dependencies for touch devices where elements remain stuck in hover state */
     .social-icon:active, .about-btn:active, .primary-main-btn:active, .grid-card:active {
         transform: scale(0.95);
+    }
+}
+
+/* Mirrored clip-path for hover */
+.about-btn:hover, .social-icon:hover, .lover-btn:hover, .msg-btn:hover, .primary-main-btn:hover {
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)) !important;
+}
+
+/* ── Side Panels ── */
+.side-panel {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 220px;
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 100;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.side-left {
+    left: 40px;
+    clip-path: polygon(15px 0, 100% 0, 100% 100%, 0 100%, 0 15px);
+    border-left: 3px solid var(--accent);
+}
+
+.side-right {
+    right: 40px;
+    clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%);
+    border-right: 3px solid var(--accent);
+}
+
+.side-panel:hover {
+    background: rgba(20, 20, 20, 0.85);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.side-left:hover {
+    transform: translateY(-50%) translateX(5px);
+}
+
+.side-right:hover {
+    transform: translateY(-50%) translateX(-5px);
+}
+
+.panel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.panel-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 4px;
+    margin-bottom: 5px;
+}
+
+.clock-display {
+    font-family: var(--font-cmd);
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-main);
+    text-shadow: 0 0 10px var(--glow);
+}
+
+.date-display {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.diag-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.diag-list li {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.diag-list i {
+    color: var(--accent);
+    width: 16px;
+    text-align: center;
+}
+
+.diag-val {
+    margin-left: auto;
+    font-weight: 600;
+    color: #22c55e;
+}
+
+.activity-display {
+    font-size: 0.85rem;
+    color: var(--text-main);
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.activity-display .spotify-title {
+    font-weight: 700;
+    color: #1DB954; /* Spotify Green */
+    display: block;
+    margin-bottom: 2px;
+}
+.activity-display .activity-artist {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+@media (max-width: 1100px) {
+    .side-panel {
+        display: none;
     }
 }

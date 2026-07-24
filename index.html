@@ -67,101 +67,93 @@
             <button class="lang-btn" data-lang="PT">PT</button>
         </div>
 
+        <!-- Left Sidebar: System Info & Clock -->
+        <div class="side-panel side-left">
+            <div class="panel-section">
+                <div class="panel-title">SYS_TIME</div>
+                <div class="clock-display" id="clock-display">00:00:00</div>
+                <div class="date-display" id="date-display">00/00/0000</div>
+            </div>
+            <div class="panel-section">
+                <div class="panel-title">DIAGNOSTICS</div>
+                <ul class="diag-list">
+                    <li><i class="fas fa-microchip"></i> CPU: <span class="diag-val">NORMAL</span></li>
+                    <li><i class="fas fa-network-wired"></i> NET: <span class="diag-val">SECURE</span></li>
+                    <li><i class="fas fa-shield-alt"></i> DEF: <span class="diag-val">ACTIVE</span></li>
+                </ul>
+            </div>
+        </div>
 
-        <main class="profile-card">
-
-            <div class="card-content">
-                <div class="avatar-container">
-                    <img src="https://ui-avatars.com/api/?name=F&background=random&size=150" alt="Profile Picture"
-                        class="avatar">
-                    <div class="status-dot">
-                        <span class="status-tooltip" id="status-tooltip" data-i18n="offline">Offline</span>
-                    </div>
-                </div>
-
-                <h1 class="name">Faustino</h1>
-                <p class="tagline">@faustino</p>
-
-                <div class="social-links">
-                    <a href="https://www.roblox.com/users/3561671159/profile" target="_blank" rel="noopener noreferrer" class="social-icon"
-                        aria-label="Roblox"><svg class="roblox-svg" viewBox="0 0 512 512" fill="currentColor" width="20"
-                            height="20">
-                            <path
-                                d="M124.539 0L0 387.47 387.461 512 512 124.53 124.539 0zM283.395 340.267l-112.676-29.958 29.958-112.676 112.676 29.958-29.958 112.676z" />
-                        </svg></a>
-                    <a href="https://www.instagram.com/garbielp.p" target="_blank" rel="noopener noreferrer" class="social-icon"
-                        aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://mail.google.com/mail/?view=cm&to=loomkori@gmail.com" target="_blank" rel="noopener noreferrer"
-                        class="social-icon email-icon" aria-label="Gmail">
-                        <i class="fas fa-envelope"></i>
-                        <span class="email-tooltip">loomkori@gmail.com</span>
-                    </a>
-                    <a href="https://discord.com/users/833078738022563940" target="_blank" rel="noopener noreferrer" class="social-icon"
-                        aria-label="Discord"><i class="fab fa-discord"></i></a>
+        <!-- Right Sidebar: Activity / Music -->
+        <div class="side-panel side-right">
+            <div class="panel-section">
+                <div class="panel-title">ACTIVITY_LOG</div>
+                <div class="activity-display" id="activity-display">
+                    <i class="fas fa-satellite-dish" style="animation: pulse 2s infinite;"></i> Awaiting uplink...
                 </div>
             </div>
+        </div>
 
-            <div class="bottom-bar" id="bottom-bar">
-                <div class="bar-header">
-                    <span class="bar-title" data-i18n="bar_title">more about me...</span>
-                    <i class="fas fa-chevron-down toggle-icon"></i>
-                </div>
-                <div class="bar-details">
-                    <div class="main-action-wrapper">
-                        <button class="about-btn primary-main-btn" data-modal="aboutme">
-                            <i class="fas fa-user-astronaut"></i>
-                            <span data-i18n="btn_about">About Me</span>
-                        </button>
+
+        <div class="profile-card-wrapper" id="profile-card-wrapper">
+            <main class="profile-card">
+
+                <div class="card-content">
+                    <div class="avatar-container">
+                        <img src="https://ui-avatars.com/api/?name=F&background=random&size=150" alt="Profile Picture"
+                            class="avatar">
+                        <div class="status-dot">
+                            <span class="status-tooltip" id="status-tooltip" data-i18n="offline">Offline</span>
+                        </div>
                     </div>
-                    <div class="about-scroll-row">
-                        <button class="about-btn" data-modal="games">
-                            <i class="fas fa-gamepad"></i>
-                            <span data-i18n="btn_games">Games</span>
-                        </button>
-                        <button class="about-btn" data-modal="anime">
-                            <i class="fas fa-dragon"></i>
-                            <span data-i18n="btn_anime">Anime</span>
-                        </button>
-                        <button class="about-btn" data-modal="communities">
-                            <i class="fas fa-users"></i>
-                            <span data-i18n="btn_communities">Communities</span>
-                        </button>
-                        <button class="about-btn" data-modal="skills">
-                            <i class="fas fa-terminal"></i>
-                            <span data-i18n="btn_skills">Skills</span>
-                        </button>
-                        <button class="about-btn" data-modal="likings">
-                            <i class="fas fa-star"></i>
-                            <span data-i18n="btn_likings">Likings</span>
-                        </button>
-                        <button class="about-btn" data-modal="learning">
-                            <i class="fas fa-book-open"></i>
-                            <span data-i18n="btn_learning">Learning</span>
-                        </button>
-                        <button class="about-btn" data-modal="comforts">
-                            <i class="fas fa-cloud-moon"></i>
-                            <span data-i18n="btn_comforts">Comforts</span>
-                        </button>
-                        <button class="about-btn" data-modal="funfacts">
-                            <i class="fas fa-wand-magic-sparkles"></i>
-                            <span data-i18n="btn_funfacts">Fun Facts</span>
-                        </button>
-                        <button class="about-btn" data-modal="goals">
-                            <i class="fas fa-rocket"></i>
-                            <span data-i18n="btn_goals">Goals</span>
-                        </button>
-                        <button class="about-btn" data-modal="talktome">
-                            <i class="fas fa-comment-dots"></i>
-                            <span data-i18n="btn_talk">Talk to Me</span>
-                        </button>
-                        <button class="about-btn lover-btn" data-modal="lover">
-                            <i class="fas fa-heart"></i>
-                            <span data-i18n="btn_lover">Lover</span>
-                        </button>
+
+                    <h1 class="name" data-i18n="name">Faustino</h1>
+                    <p class="tagline">@faustino</p>
+
+                    <div class="social-links">
+                        <a href="https://www.roblox.com/users/3561671159/profile" target="_blank" rel="noopener noreferrer" class="social-icon"
+                            aria-label="Roblox"><svg class="roblox-svg" viewBox="0 0 512 512" fill="currentColor" width="20"
+                                height="20">
+                                <path
+                                    d="M124.539 0L0 387.47 387.461 512 512 124.53 124.539 0zM283.395 340.267l-112.676-29.958 29.958-112.676 112.676 29.958-29.958 112.676z" />
+                            </svg></a>
+                        <a href="https://www.instagram.com/garbielp.p" target="_blank" rel="noopener noreferrer" class="social-icon"
+                            aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://mail.google.com/mail/?view=cm&to=loomkori@gmail.com" target="_blank" rel="noopener noreferrer"
+                            class="social-icon email-icon" aria-label="Gmail">
+                            <i class="fas fa-envelope"></i>
+                            <span class="email-tooltip">loomkori@gmail.com</span>
+                        </a>
+                        <a href="https://discord.com/users/833078738022563940" target="_blank" rel="noopener noreferrer" class="social-icon"
+                            aria-label="Discord"><i class="fab fa-discord"></i></a>
                     </div>
                 </div>
-            </div>
-        </main>
+
+                <div class="bottom-bar" id="bottom-bar">
+                    <div class="bar-header">
+                        <span class="bar-title" data-i18n="about_me">About Me</span>
+                        <i class="fas fa-chevron-down toggle-icon"></i>
+                    </div>
+                    <div class="bar-details">
+                        <div class="about-scroll-row">
+                            <button class="about-btn" data-modal="aboutme"><i class="fas fa-user"></i> <span data-i18n="btn_about">About</span></button>
+                            <button class="about-btn" data-modal="games"><i class="fas fa-gamepad"></i> <span data-i18n="btn_games">Games</span></button>
+                            <button class="about-btn" data-modal="anime"><i class="fas fa-dragon"></i> <span data-i18n="btn_anime">Anime</span></button>
+                            <button class="about-btn" data-modal="skills"><i class="fas fa-code"></i> <span data-i18n="btn_skills">Skills</span></button>
+                            <button class="about-btn" data-modal="likings"><i class="fas fa-heart"></i> <span data-i18n="btn_likings">Likings</span></button>
+                            <button class="about-btn" data-modal="learning"><i class="fas fa-book"></i> <span data-i18n="btn_learning">Learning</span></button>
+                            <button class="about-btn" data-modal="communities"><i class="fas fa-users"></i> <span data-i18n="btn_communities">Communities</span></button>
+                            <button class="about-btn" data-modal="comforts"><i class="fas fa-cloud"></i> <span data-i18n="btn_comforts">Comforts</span></button>
+                            <button class="about-btn" data-modal="funfacts"><i class="fas fa-star"></i> <span data-i18n="btn_funfacts">Fun Facts</span></button>
+                            <button class="about-btn" data-modal="goals"><i class="fas fa-flag-checkered"></i> <span data-i18n="btn_goals">Goals</span></button>
+                            <button class="about-btn" data-modal="talktome"><i class="fas fa-comment"></i> <span data-i18n="btn_talk">Talk</span></button>
+                            <button class="about-btn" data-modal="lover"><i class="fas fa-heart"></i> <span data-i18n="btn_lover">Lover</span></button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
 
         <div class="modal-overlay" id="modal-overlay">
             <div class="modal-card">

@@ -46,6 +46,62 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
     }
 
     // Set initial active state
+    
+
+    // ── Side Panel Logic ──
+    const clockDisplay = document.getElementById('clock-display');
+    const dateDisplay = document.getElementById('date-display');
+    if (clockDisplay && dateDisplay) {
+        setInterval(() => {
+            const now = new Date();
+            clockDisplay.innerText = now.toLocaleTimeString('en-US', { hour12: false });
+            dateDisplay.innerText = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase();
+        }, 1000);
+    }
+
+    // ── Mouse Parallax Effect ──
+    const cardWrapper = document.getElementById('profile-card-wrapper');
+    if (cardWrapper) {
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 45;
+            const y = (window.innerHeight / 2 - e.pageY) / 45;
+            cardWrapper.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${y}deg)`;
+        });
+        
+        // Reset on mouse leave window
+        document.addEventListener('mouseleave', () => {
+            cardWrapper.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
+            cardWrapper.style.transition = 'transform 0.5s ease-out';
+        });
+        document.addEventListener('mouseenter', () => {
+            cardWrapper.style.transition = 'none';
+        });
+    }
+
+    // ── Text Scramble Effect ──
+    function scrambleText(el, newText) {
+        // Only scramble if it's plain text (no HTML tags)
+        if (newText.includes('<')) {
+            el.innerHTML = newText;
+            return;
+        }
+        
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+        let iterations = 0;
+        const interval = setInterval(() => {
+            el.innerText = newText.split('').map((char, index) => {
+                if (index < iterations || char === ' ') return char;
+                return chars[Math.floor(Math.random() * chars.length)];
+            }).join('');
+            
+            if (iterations >= newText.length) {
+                clearInterval(interval);
+                el.innerText = newText;
+            }
+            iterations += 1/2; // speed
+        }, 30);
+    }
+
     const langSwitcher = document.getElementById('lang-switcher');
     if (langSwitcher) langSwitcher.setAttribute('data-active', currentLang);
 
@@ -86,7 +142,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             if (dict[key]) {
                 el.classList.add('fade-text');
                 setTimeout(() => {
-                    el.innerHTML = dict[key];
+                    scrambleText(el, dict[key]);
                     el.classList.remove('fade-text');
                 }, 300); // Wait for CSS transition (0.3s)
             }
@@ -492,6 +548,37 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
             const currentStatusColor = statusColors[data.discord_status] || statusColors.offline;
             statusDot.style.backgroundColor = currentStatusColor;
             statusDot.style.boxShadow = `0 0 10px ${currentStatusColor}`;
+
+        // Update Activity Log on Side Panel
+        const activityDisplay = document.getElementById('activity-display');
+        if (activityDisplay && !isLover) {
+            let foundActivity = false;
+            if (data.activities && data.activities.length > 0) {
+                // Find spotify or playing
+                const spotify = data.activities.find(a => a.name === 'Spotify');
+                const playing = data.activities.find(a => a.type === 0); // Type 0 is PLAYING
+                
+                if (spotify) {
+                    activityDisplay.innerHTML = `
+                        <span class="spotify-title"><i class="fab fa-spotify"></i> LISTENING TO SPOTIFY</span>
+                        ${spotify.details}<br>
+                        <span class="activity-artist">by ${spotify.state}</span>
+                    `;
+                    foundActivity = true;
+                } else if (playing) {
+                    activityDisplay.innerHTML = `
+                        <span style="color: var(--accent); font-weight: 700;"><i class="fas fa-gamepad"></i> PLAYING</span><br>
+                        ${playing.name}<br>
+                        <span class="activity-artist">${playing.details || playing.state || ''}</span>
+                    `;
+                    foundActivity = true;
+                }
+            }
+            if (!foundActivity) {
+                activityDisplay.innerHTML = `<i class="fas fa-satellite-dish"></i> STATUS: IDLE<br><span class="activity-artist">No active processes detected.</span>`;
+            }
+        }
+
 
             const statusNames = {
                 online: 'Online',
@@ -1079,7 +1166,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
                 // Draw Particle Dot (passive state)
                 ctx.beginPath();
                 ctx.arc(px, py, p.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${rgbStr}, 0.5)`;
+                ctx.fillStyle = `rgba(${rgbStr}, 0.95)`;
                 ctx.fill();
 
                 // Passive Neural Network (particle-to-particle links)
@@ -1094,12 +1181,12 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
                         const pDist = Math.sqrt(dpx * dpx + dpy * dpy);
 
                         if (pDist < neuralRadius) {
-                            const nOpacity = (1 - pDist / neuralRadius) * 0.15; // Low opacity web
+                            const nOpacity = (1 - pDist / neuralRadius) * 0.60; // Low opacity web
                             ctx.beginPath();
                             ctx.moveTo(px, py);
                             ctx.lineTo(px2, py2);
                             ctx.strokeStyle = `rgba(${rgbStr}, ${nOpacity})`;
-                            ctx.lineWidth = 0.5;
+                            ctx.lineWidth = 1.0;
                             ctx.stroke();
                         }
                     }
