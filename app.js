@@ -503,19 +503,38 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
                 tooltip.innerText = statusNames[data.discord_status] || 'Offline';
             }
 
-            if (data.kv && data.kv.theme_color) {
-                cssTarget.style.setProperty('--accent', data.kv.theme_color);
-            } else if (discordUser.accent_color) {
-                const hexColor = '#' + discordUser.accent_color.toString(16).padStart(6, '0');
-                cssTarget.style.setProperty('--accent', hexColor);
-                cssTarget.style.setProperty('--accent-hover', hexColor);
+            function setColors(r, g, b, isLoverTarget) {
+                const hex = "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+                const hoverHex = "#" + (1 << 24 | Math.min(255, r + 30) << 16 | Math.min(255, g + 30) << 8 | Math.min(255, b + 30)).toString(16).slice(1);
 
+                cssTarget.style.setProperty('--accent', hex);
+                cssTarget.style.setProperty('--accent-hover', hoverHex);
+                cssTarget.style.setProperty('--accent-rgb', `${r}, ${g}, ${b}`);
+                cssTarget.style.setProperty('--glow', `rgba(${r}, ${g}, ${b}, 0.4)`);
+                
+                const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                if (luminance > 0.5) {
+                    cssTarget.style.setProperty('--btn-text', '#1a1a1a');
+                } else {
+                    cssTarget.style.setProperty('--btn-text', '#ffffff');
+                }
+
+                if (!isLoverTarget) window.dispatchEvent(new Event('resize'));
+            }
+
+            if (data.kv && data.kv.theme_color) {
+                let hex = data.kv.theme_color;
+                let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                if (result) {
+                    setColors(parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16), isLover);
+                } else {
+                    cssTarget.style.setProperty('--accent', data.kv.theme_color);
+                }
+            } else if (discordUser.accent_color) {
                 const r = (discordUser.accent_color >> 16) & 255;
                 const g = (discordUser.accent_color >> 8) & 255;
                 const b = discordUser.accent_color & 255;
-                cssTarget.style.setProperty('--glow', `rgba(${r}, ${g}, ${b}, 0.4)`);
-
-                if (!isLover) window.dispatchEvent(new Event('resize'));
+                setColors(r, g, b, isLover);
             } else if (discordUser.avatar) {
                 const img = new Image();
                 img.crossOrigin = "Anonymous";
@@ -529,15 +548,7 @@ let loverPresenceData = null; document.addEventListener('DOMContentLoaded', () =
                     const ctx = c.getContext('2d');
                     ctx.drawImage(img, 0, 0, 1, 1);
                     const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-
-                    const hex = "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
-                    const hoverHex = "#" + (1 << 24 | Math.min(255, r + 30) << 16 | Math.min(255, g + 30) << 8 | Math.min(255, b + 30)).toString(16).slice(1);
-
-                    cssTarget.style.setProperty('--accent', hex);
-                    cssTarget.style.setProperty('--accent-hover', hoverHex);
-                    cssTarget.style.setProperty('--glow', `rgba(${r}, ${g}, ${b}, 0.4)`);
-
-                    if (!isLover) window.dispatchEvent(new Event('resize'));
+                    setColors(r, g, b, isLover);
                 };
             }
 
